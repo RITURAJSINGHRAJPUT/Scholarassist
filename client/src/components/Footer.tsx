@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { HiMail, HiPhone, HiLocationMarker } from 'react-icons/hi';
-import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram, FaGithub } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 export default function Footer() {
     const pathname = usePathname();
@@ -43,13 +44,21 @@ export default function Footer() {
                             Professional academic guidance and support for students worldwide. Expert assistance with thesis writing, research papers, and academic projects.
                         </p>
                         <div className="flex gap-3 mt-6">
-                            {[FaFacebook, FaTwitter, FaLinkedin, FaInstagram].map((Icon, i) => (
+                            {[
+                                { Icon: FaXTwitter, href: '#' },
+                                { Icon: FaLinkedin, href: '#' },
+                                { Icon: FaInstagram, href: '#' },
+                                { Icon: FaGithub, href: '#' },
+                                { Icon: HiMail, href: 'mailto:contact@scholarassist.com' }
+                            ].map((item, i) => (
                                 <a
                                     key={i}
-                                    href="#"
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-primary-600 transition-colors"
                                 >
-                                    <Icon className="w-4 h-4" />
+                                    <item.Icon className="w-4 h-4" />
                                 </a>
                             ))}
                         </div>
@@ -87,11 +96,11 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <HiPhone className="w-5 h-5 text-primary-400 mt-0.5 shrink-0" />
-                                <span>+1 (800) 555-0199</span>
+                                <span>+91 9979550377</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <HiLocationMarker className="w-5 h-5 text-primary-400 mt-0.5 shrink-0" />
-                                <span>123 Academic Drive, Education City, EC 10001</span>
+                                <span>Surat, Gujarat, India</span>
                             </li>
                         </ul>
                     </div>

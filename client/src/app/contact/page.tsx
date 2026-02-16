@@ -30,9 +30,9 @@ export default function ContactPage() {
                         <div className="space-y-6">
                             {[
                                 { icon: HiMail, title: 'Email', info: 'contact@scholarassist.com' },
-                                { icon: HiPhone, title: 'Phone', info: '+1 (800) 555-0199' },
-                                { icon: HiLocationMarker, title: 'Address', info: '123 Academic Drive, Education City, EC 10001' },
-                                { icon: HiClock, title: 'Hours', info: 'Mon - Fri: 9AM - 6PM EST' },
+                                { icon: HiPhone, title: 'Phone', info: '+91 9979550377' },
+                                { icon: HiLocationMarker, title: 'Address', info: 'Surat, Gujarat, India' },
+                                { icon: HiClock, title: 'Hours', info: 'Mon - Fri: 9AM - 6PM IST' },
                             ].map((item, i) => (
                                 <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                                     <div className="flex items-start gap-4">
