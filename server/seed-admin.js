@@ -4,13 +4,22 @@ const bcrypt = require('bcryptjs');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
+
+// ==========================================
+// CONFIGURATION - CHANGE THESE VALUES
+// ==========================================
+const NEW_USERNAME = 'admin';
+const NEW_PASSWORD = '799020';
+const NEW_EMAIL = 'admin@scholarassist.com';
+// ==========================================
 
 async function seedAdmin() {
     try {
         // Test connection
-        const connTest = await pool.query('SELECT NOW()');
-        console.log('✓ Database connected:', connTest.rows[0].now);
+        constVE = await pool.query('SELECT NOW()');
+        console.log('✓ Database connected:', constVE.rows[0].now);
 
         // Check if tables exist
         const tables = await pool.query(`
@@ -32,23 +41,23 @@ async function seedAdmin() {
             console.log('  Users:', existing.rows.map(r => `${r.username} (${r.email})`).join(', '));
 
             // Reset password for existing admin
-            const passwordHash = await bcrypt.hash('admin123', 12);
-            await pool.query('UPDATE admin_users SET password_hash = $1 WHERE username = $2', [passwordHash, 'admin']);
-            console.log('\n✓ Password reset to "admin123" for user "admin"');
+            const passwordHash = await bcrypt.hash(NEW_PASSWORD, 12);
+            await pool.query('UPDATE admin_users SET password_hash = $1 WHERE username = $2', [passwordHash, NEW_USERNAME]);
+            console.log(`\n✓ Password reset to "${NEW_PASSWORD}" for user "${NEW_USERNAME}"`);
         } else {
             // Create new admin
-            const passwordHash = await bcrypt.hash('admin123', 12);
+            const passwordHash = await bcrypt.hash(NEW_PASSWORD, 12);
             const result = await pool.query(
                 'INSERT INTO admin_users (username, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, username, email, role',
-                ['admin', 'admin@scholarassist.com', passwordHash, 'admin']
+                [NEW_USERNAME, NEW_EMAIL, passwordHash, 'admin']
             );
             console.log('\n✓ Admin user created:', result.rows[0]);
         }
 
         console.log('\n========================================');
         console.log('Login credentials:');
-        console.log('  Username: admin');
-        console.log('  Password: admin123');
+        console.log(`  Username: ${NEW_USERNAME}`);
+        console.log(`  Password: ${NEW_PASSWORD}`);
         console.log('========================================');
 
     } catch (error) {

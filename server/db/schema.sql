@@ -107,3 +107,16 @@ CREATE INDEX idx_blog_posts_created ON blog_posts(created_at DESC);
 CREATE INDEX idx_audit_logs_admin ON audit_logs(admin_id);
 CREATE INDEX idx_audit_logs_created ON audit_logs(created_at DESC);
 CREATE INDEX idx_uploaded_files_inquiry ON uploaded_files(inquiry_id);
+
+-- Testimonials
+CREATE TABLE testimonials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  role VARCHAR(255),
+  content TEXT NOT NULL,
+  rating INTEGER DEFAULT 5,
+  published BOOLEAN DEFAULT true,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
