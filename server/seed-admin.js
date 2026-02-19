@@ -11,7 +11,7 @@ const pool = new Pool({
 // CONFIGURATION - CHANGE THESE VALUES
 // ==========================================
 const NEW_USERNAME = 'admin';
-const NEW_PASSWORD = '799020';
+const NEW_PASSWORD = 'utsav@799020';
 const NEW_EMAIL = 'admin@scholarassist.com';
 // ==========================================
 

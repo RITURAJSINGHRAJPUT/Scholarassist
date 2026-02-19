@@ -25,6 +25,11 @@ export default function Navbar() {
     const [servicesOpen, setServicesOpen] = useState(false);
     const pathname = usePathname();
 
+    // Pages with dark hero backgrounds that need transparent navbar
+    const darkHeroPages = ['/', '/services', '/services/thesis', '/services/research-paper', '/services/essay-project', '/confidentiality', '/contact', '/about'];
+    const hasDarkHero = darkHeroPages.some(p => pathname === p);
+    const showSolid = scrolled || !hasDarkHero;
+
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
@@ -40,7 +45,7 @@ export default function Navbar() {
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showSolid
                 ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-primary-100'
                 : 'bg-transparent'
                 }`}
@@ -52,7 +57,7 @@ export default function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-lg group-hover:shadow-primary-400/30 transition-shadow">
                             <span className="text-white font-bold text-lg font-[var(--font-heading)]">S</span>
                         </div>
-                        <span className={`text-xl font-bold font-[var(--font-heading)] transition-colors ${scrolled ? 'text-primary-800' : 'text-white'}`}>
+                        <span className={`text-xl font-bold font-[var(--font-heading)] transition-colors ${showSolid ? 'text-primary-800' : 'text-white'}`}>
                             Scholar<span className="text-primary-400">Assist</span>
                         </span>
                     </Link>
@@ -65,8 +70,8 @@ export default function Navbar() {
                                     <>
                                         <button
                                             className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-primary-50/80 ${pathname?.startsWith(link.href)
-                                                ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
-                                                : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
+                                                ? showSolid ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
+                                                : showSolid ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
                                                 }`}
                                         >
                                             {link.name}
@@ -91,8 +96,8 @@ export default function Navbar() {
                                     <Link
                                         href={link.href}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-primary-50/80 ${pathname === link.href
-                                            ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
-                                            : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
+                                            ? showSolid ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
+                                            : showSolid ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
                                             }`}
                                     >
                                         {link.name}
@@ -111,7 +116,7 @@ export default function Navbar() {
                     {/* Mobile menu button */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'
+                        className={`lg:hidden p-2 rounded-lg transition-colors ${showSolid ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'
                             }`}
                     >
                         {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
