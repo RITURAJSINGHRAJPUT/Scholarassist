@@ -48,7 +48,7 @@ function setupSecurity(app) {
     // Strict rate limiting for public submissions
     const submitLimiter = rateLimit({
         windowMs: 60 * 60 * 1000, // 1 hour
-        max: 5,
+        max: 20,
         message: { error: 'Too many submissions. Please try again later.' },
     });
     app.use('/api/inquiries', submitLimiter);
