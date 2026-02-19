@@ -41,15 +41,15 @@ export default function Navbar() {
     return (
         <nav
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-primary-100'
-                    : 'bg-transparent'
+                ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-primary-100'
+                : 'bg-transparent'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
+                <div className="flex items-center justify-between h-14">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-lg group-hover:shadow-primary-400/30 transition-shadow">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-lg group-hover:shadow-primary-400/30 transition-shadow">
                             <span className="text-white font-bold text-lg font-[var(--font-heading)]">S</span>
                         </div>
                         <span className={`text-xl font-bold font-[var(--font-heading)] transition-colors ${scrolled ? 'text-primary-800' : 'text-white'}`}>
@@ -65,8 +65,8 @@ export default function Navbar() {
                                     <>
                                         <button
                                             className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-primary-50/80 ${pathname?.startsWith(link.href)
-                                                    ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
-                                                    : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
+                                                ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
+                                                : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
                                                 }`}
                                         >
                                             {link.name}
@@ -91,8 +91,8 @@ export default function Navbar() {
                                     <Link
                                         href={link.href}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-primary-50/80 ${pathname === link.href
-                                                ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
-                                                : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
+                                            ? scrolled ? 'text-primary-700 bg-primary-50' : 'text-white bg-white/15'
+                                            : scrolled ? 'text-slate-700 hover:text-primary-700' : 'text-white/90 hover:text-white'
                                             }`}
                                     >
                                         {link.name}

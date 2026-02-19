@@ -175,26 +175,32 @@ export default function HomePage() {
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-medium rounded-full mb-4">Testimonials</span>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 font-[var(--font-heading)]">What Our Students Say</h2>
             </div>
-            <div className="relative overflow-hidden group">
-              <div className="flex animate-scroll gap-8 w-max">
-                {/* First Set */}
+            {testimonials.length < 3 ? (
+              <div className="flex flex-wrap justify-center gap-8">
                 {testimonials.map(t => (
-                  <div key={`original-${t.id}`} className="flex-shrink-0 w-[350px]">
-                    <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
-                  </div>
-                ))}
-                {/* Duplicate Set for Seamless Loop */}
-                {testimonials.map(t => (
-                  <div key={`duplicate-${t.id}`} className="flex-shrink-0 w-[350px]">
+                  <div key={t.id} className="w-[350px]">
                     <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
                   </div>
                 ))}
               </div>
-
-              {/* Manual Gradient Fade on Edges */}
-              <div className="absolute top-0 left-0 h-full w-20 bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10"></div>
-              <div className="absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10"></div>
-            </div>
+            ) : (
+              <div className="relative overflow-hidden group">
+                <div className="flex animate-scroll gap-8 w-max">
+                  {testimonials.map(t => (
+                    <div key={`original-${t.id}`} className="flex-shrink-0 w-[350px]">
+                      <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
+                    </div>
+                  ))}
+                  {testimonials.map(t => (
+                    <div key={`duplicate-${t.id}`} className="flex-shrink-0 w-[350px]">
+                      <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute top-0 left-0 h-full w-20 bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10"></div>
+                <div className="absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10"></div>
+              </div>
+            )}
           </div>
         </section>
       )}

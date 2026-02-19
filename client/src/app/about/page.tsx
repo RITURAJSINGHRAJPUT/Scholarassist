@@ -9,10 +9,10 @@ export const metadata: Metadata = generateSEO({
 });
 
 const team = [
-    { name: 'Dr. Margaret Reynolds', role: 'Founder & Lead Advisor', field: 'PhD in Education, Harvard University' },
-    { name: 'Prof. James Carter', role: 'Research Director', field: 'Former Professor, MIT' },
-    { name: 'Dr. Aisha Patel', role: 'Thesis Specialist', field: 'PhD in Sociology, Oxford University' },
-    { name: 'Michael Brooks', role: 'Student Success Manager', field: 'M.Ed in Higher Education' },
+    { name: 'Rituraj Singh', role: 'Founder & Lead', field: 'Project Manager, B.Tech', image: '/Rituraj.jpg' },
+    // { name: 'Prof. James Carter', role: 'Research Director', field: 'Former Professor, MIT' },
+    // { name: 'Dr. Aisha Patel', role: 'Thesis Specialist', field: 'PhD in Sociology, Oxford University' },
+    // { name: 'Michael Brooks', role: 'Student Success Manager', field: 'M.Ed in Higher Education' },
 ];
 
 export default function AboutPage() {
@@ -77,12 +77,16 @@ export default function AboutPage() {
             <section className="py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold text-slate-900 font-[var(--font-heading)] text-center mb-12">Meet Our Team</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="flex flex-wrap justify-center gap-8">
                         {team.map((t, i) => (
-                            <div key={i} className="text-center card-hover bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 font-[var(--font-heading)]">
-                                    {t.name.split(' ').map(n => n[0]).join('')}
-                                </div>
+                            <div key={i} className="w-full sm:w-64 text-center card-hover bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                                {t.image ? (
+                                    <img src={t.image} alt={t.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-md" />
+                                ) : (
+                                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 font-[var(--font-heading)]">
+                                        {t.name.split(' ').map(n => n[0]).join('')}
+                                    </div>
+                                )}
                                 <h3 className="font-bold text-slate-900">{t.name}</h3>
                                 <p className="text-primary-600 text-sm font-medium mt-1">{t.role}</p>
                                 <p className="text-slate-500 text-xs mt-1">{t.field}</p>
