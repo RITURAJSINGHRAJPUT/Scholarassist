@@ -1,20 +1,19 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const xss = require('xss');
 const pool = require('../config/db');
 const { logAction } = require('../utils/auditLog');
+const { validateLogin, validateSeed } = require('../middleware/validate');
 
 const router = express.Router();
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', validateLogin, async (req, res) => {
     try {
         const { username, password } = req.body;
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Username and password are required' });
-        }
 
-        const result = await pool.query('SELECT * FROM admin_users WHERE username = $1', [username]);
+        const result = await pool.query('SELECT * FROM admin_users WHERE username = $1', [xss(username)]);
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -49,7 +48,7 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/auth/seed - One-time admin seed (dev only)
-router.post('/seed', async (req, res) => {
+router.post('/seed', validateSeed, async (req, res) => {
     try {
         const existing = await pool.query('SELECT COUNT(*) FROM admin_users');
         if (parseInt(existing.rows[0].count) > 0) {
@@ -57,14 +56,11 @@ router.post('/seed', async (req, res) => {
         }
 
         const { username, email, password } = req.body;
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: 'Username, email, and password are required' });
-        }
 
         const passwordHash = await bcrypt.hash(password, 12);
         const result = await pool.query(
             'INSERT INTO admin_users (username, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, username, email, role',
-            [username, email, passwordHash, 'admin']
+            [xss(username), xss(email), passwordHash, 'admin']
         );
 
         res.status(201).json({ message: 'Admin user created', admin: result.rows[0] });

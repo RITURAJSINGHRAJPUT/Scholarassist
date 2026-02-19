@@ -9,6 +9,7 @@ const { authenticate } = require('../middleware/auth');
 const { encrypt } = require('../utils/encryption');
 const { sendNewInquiryNotification } = require('../utils/email');
 const { logAction } = require('../utils/auditLog');
+const { validateInquiry, validateInquiryStatus, validateUUID, validatePagination, handleValidationErrors } = require('../middleware/validate');
 
 const router = express.Router();
 const uploadDir = process.env.UPLOAD_DIR || './uploads';
@@ -30,20 +31,9 @@ async function verifyRecaptcha(token) {
 }
 
 // POST /api/inquiries - Create inquiry (public)
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', upload.single('file'), validateInquiry, async (req, res) => {
     try {
         const { name, email, phone, academic_level, service_type, deadline, message, recaptcha_token } = req.body;
-
-        // Validate required fields
-        if (!name || !email || !service_type) {
-            return res.status(400).json({ error: 'Name, email, and service type are required' });
-        }
-
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ error: 'Invalid email address' });
-        }
 
         // Verify reCAPTCHA
         const isHuman = await verifyRecaptcha(recaptcha_token);
@@ -112,7 +102,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 });
 
 // GET /api/inquiries - List all (admin)
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticate, validatePagination, handleValidationErrors, async (req, res) => {
     try {
         const { status, page = 1, limit = 20 } = req.query;
         const offset = (page - 1) * limit;
@@ -128,12 +118,16 @@ router.get('/', authenticate, async (req, res) => {
         const params = [];
 
         if (status) {
+            const validStatuses = ['new', 'in_progress', 'completed'];
+            if (!validStatuses.includes(status)) {
+                return res.status(400).json({ error: 'Invalid status filter' });
+            }
             query += ' WHERE i.status = $1';
             params.push(status);
         }
 
         query += ` GROUP BY i.id, u.name, u.email, u.phone, u.academic_level ORDER BY i.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-        params.push(limit, offset);
+        params.push(parseInt(limit), parseInt(offset));
 
         const result = await pool.query(query, params);
 
@@ -159,7 +153,7 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // GET /api/inquiries/:id - Get one (admin)
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT i.*, u.name, u.email, u.phone, u.academic_level
@@ -184,13 +178,9 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 // PATCH /api/inquiries/:id/status - Update status (admin)
-router.patch('/:id/status', authenticate, async (req, res) => {
+router.patch('/:id/status', authenticate, validateUUID('id'), validateInquiryStatus, async (req, res) => {
     try {
         const { status } = req.body;
-        const validStatuses = ['new', 'in_progress', 'completed'];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ error: 'Invalid status' });
-        }
 
         const result = await pool.query(
             'UPDATE inquiries SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
@@ -211,7 +201,7 @@ router.patch('/:id/status', authenticate, async (req, res) => {
 });
 
 // DELETE /api/inquiries/:id - Delete (admin)
-router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         // Delete associated files from disk
         const files = await pool.query('SELECT stored_name FROM uploaded_files WHERE inquiry_id = $1', [req.params.id]);

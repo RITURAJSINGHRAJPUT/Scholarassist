@@ -5,12 +5,13 @@ const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 const { decrypt } = require('../utils/encryption');
 const { logAction } = require('../utils/auditLog');
+const { validateUUID, handleValidationErrors } = require('../middleware/validate');
 
 const router = express.Router();
 const uploadDir = process.env.UPLOAD_DIR || './uploads';
 
 // GET /api/files/:id/download - Secure file download (admin only)
-router.get('/:id/download', authenticate, async (req, res) => {
+router.get('/:id/download', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         const result = await pool.query(
             'SELECT * FROM uploaded_files WHERE id = $1',

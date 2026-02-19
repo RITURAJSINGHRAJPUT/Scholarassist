@@ -7,6 +7,7 @@ const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 const { logAction } = require('../utils/auditLog');
 const upload = require('../middleware/upload');
+const { validateBlogPost, validateBlogCategory, validateUUID, validatePagination, handleValidationErrors } = require('../middleware/validate');
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ function generateSlug(title) {
 // ==================== PUBLIC ROUTES ====================
 
 // GET /api/blog/posts - List published posts
-router.get('/posts', async (req, res) => {
+router.get('/posts', validatePagination, handleValidationErrors, async (req, res) => {
     try {
         const { category, page = 1, limit = 10 } = req.query;
         const offset = (page - 1) * limit;
@@ -43,12 +44,14 @@ router.get('/posts', async (req, res) => {
         const params = [];
 
         if (category) {
+            // Sanitize category slug
+            const safeCategory = category.replace(/[^a-z0-9-]/g, '');
             query += ` AND bc.slug = $${params.length + 1}`;
-            params.push(category);
+            params.push(safeCategory);
         }
 
         query += ` ORDER BY bp.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-        params.push(limit, offset);
+        params.push(parseInt(limit), parseInt(offset));
 
         const result = await pool.query(query, params);
 
@@ -56,7 +59,7 @@ router.get('/posts', async (req, res) => {
         const countParams = [];
         if (category) {
             countQuery += ' AND category_id = (SELECT id FROM blog_categories WHERE slug = $1)';
-            countParams.push(category);
+            countParams.push(category.replace(/[^a-z0-9-]/g, ''));
         }
         const countResult = await pool.query(countQuery, countParams);
 
@@ -75,13 +78,16 @@ router.get('/posts', async (req, res) => {
 // GET /api/blog/posts/:slug - Get single post by slug
 router.get('/posts/:slug', async (req, res) => {
     try {
+        // Sanitize slug
+        const safeSlug = req.params.slug.replace(/[^a-z0-9-]/g, '');
+
         const result = await pool.query(
             `SELECT bp.*, bc.name as category_name, bc.slug as category_slug, au.username as author
        FROM blog_posts bp
        LEFT JOIN blog_categories bc ON bp.category_id = bc.id
        LEFT JOIN admin_users au ON bp.author_id = au.id
        WHERE bp.slug = $1 AND bp.published = true`,
-            [req.params.slug]
+            [safeSlug]
         );
 
         if (result.rows.length === 0) {
@@ -131,12 +137,9 @@ router.get('/admin/posts', authenticate, async (req, res) => {
 });
 
 // POST /api/blog/admin/posts - Create post (admin)
-router.post('/admin/posts', authenticate, async (req, res) => {
+router.post('/admin/posts', authenticate, validateBlogPost, async (req, res) => {
     try {
         const { title, content, excerpt, category_id, published, featured_image, meta_title, meta_description } = req.body;
-        if (!title || !content) {
-            return res.status(400).json({ error: 'Title and content are required' });
-        }
 
         const slug = generateSlug(title);
         const result = await pool.query(
@@ -154,7 +157,7 @@ router.post('/admin/posts', authenticate, async (req, res) => {
 });
 
 // PUT /api/blog/admin/posts/:id - Update post (admin)
-router.put('/admin/posts/:id', authenticate, async (req, res) => {
+router.put('/admin/posts/:id', authenticate, validateUUID('id'), validateBlogPost, async (req, res) => {
     try {
         const { title, content, excerpt, category_id, published, featured_image, meta_title, meta_description } = req.body;
         const slug = title ? generateSlug(title) : undefined;
@@ -188,7 +191,7 @@ router.put('/admin/posts/:id', authenticate, async (req, res) => {
 });
 
 // DELETE /api/blog/admin/posts/:id - Delete post (admin)
-router.delete('/admin/posts/:id', authenticate, async (req, res) => {
+router.delete('/admin/posts/:id', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM blog_posts WHERE id = $1 RETURNING id, title', [req.params.id]);
         if (result.rows.length === 0) {
@@ -204,10 +207,9 @@ router.delete('/admin/posts/:id', authenticate, async (req, res) => {
 });
 
 // POST /api/blog/admin/categories - Create category (admin)
-router.post('/admin/categories', authenticate, async (req, res) => {
+router.post('/admin/categories', authenticate, validateBlogCategory, async (req, res) => {
     try {
         const { name, description } = req.body;
-        if (!name) return res.status(400).json({ error: 'Category name is required' });
         const slug = generateSlug(name);
 
         const result = await pool.query(
@@ -222,7 +224,7 @@ router.post('/admin/categories', authenticate, async (req, res) => {
 });
 
 // DELETE /api/blog/admin/categories/:id - Delete category (admin)
-router.delete('/admin/categories/:id', authenticate, async (req, res) => {
+router.delete('/admin/categories/:id', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM blog_categories WHERE id = $1 RETURNING id', [req.params.id]);
         if (result.rows.length === 0) return res.status(404).json({ error: 'Category not found' });

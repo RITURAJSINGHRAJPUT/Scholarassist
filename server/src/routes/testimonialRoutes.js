@@ -2,6 +2,7 @@ const express = require('express');
 const xss = require('xss');
 const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
+const { validateTestimonial, validateUUID, handleValidationErrors } = require('../middleware/validate');
 
 const router = express.Router();
 
@@ -36,12 +37,9 @@ router.get('/admin', authenticate, async (req, res) => {
 });
 
 // POST /api/testimonials/admin - Create testimonial (admin)
-router.post('/admin', authenticate, async (req, res) => {
+router.post('/admin', authenticate, validateTestimonial, async (req, res) => {
     try {
         const { name, role, content, rating, published, display_order } = req.body;
-        if (!name || !content) {
-            return res.status(400).json({ error: 'Name and content are required' });
-        }
 
         const result = await pool.query(
             `INSERT INTO testimonials (name, role, content, rating, published, display_order)
@@ -56,7 +54,7 @@ router.post('/admin', authenticate, async (req, res) => {
 });
 
 // PUT /api/testimonials/admin/:id - Update testimonial (admin)
-router.put('/admin/:id', authenticate, async (req, res) => {
+router.put('/admin/:id', authenticate, validateUUID('id'), validateTestimonial, async (req, res) => {
     try {
         const { name, role, content, rating, published, display_order } = req.body;
 
@@ -83,7 +81,7 @@ router.put('/admin/:id', authenticate, async (req, res) => {
 });
 
 // DELETE /api/testimonials/admin/:id - Delete testimonial (admin)
-router.delete('/admin/:id', authenticate, async (req, res) => {
+router.delete('/admin/:id', authenticate, validateUUID('id'), handleValidationErrors, async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM testimonials WHERE id = $1 RETURNING id', [req.params.id]);
         if (result.rows.length === 0) {
