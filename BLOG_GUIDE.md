@@ -5,7 +5,7 @@
 1. Go to **http://localhost:3000/admin/login**
 2. Login with your admin credentials:
    - **Username:** `admin`
-   - **Password:** `admin123`
+   - **Password:** `799020`
 3. You'll be redirected to the admin dashboard
 
 ---
