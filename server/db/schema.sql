@@ -120,3 +120,16 @@ CREATE TABLE testimonials (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Document Fingerprints (for plagiarism cross-document comparison)
+CREATE TABLE IF NOT EXISTS document_fingerprints (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  document_hash VARCHAR(64) NOT NULL UNIQUE,
+  fingerprints JSONB NOT NULL DEFAULT '[]',
+  word_count INTEGER DEFAULT 0,
+  sentence_count INTEGER DEFAULT 0,
+  source_label VARCHAR(500) DEFAULT 'Direct Text Input',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_document_fingerprints_hash ON document_fingerprints(document_hash);

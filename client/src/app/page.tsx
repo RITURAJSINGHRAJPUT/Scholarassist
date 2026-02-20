@@ -113,7 +113,7 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 font-[var(--font-heading)]">Comprehensive Academic Support</h2>
             <p className="text-slate-600 mt-4 max-w-2xl mx-auto">From thesis writing to project documentation, we provide expert guidance tailored to your academic needs.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <ServiceCard
               title="Thesis Assistance"
               description="Expert guidance for your thesis from topic selection to final submission. Our advisors help you craft a compelling research narrative."
@@ -134,6 +134,13 @@ export default function HomePage() {
               icon={HiPencilAlt}
               href="/services/essay-project"
               features={['Structure & Outline', 'Content Development', 'Quality Review']}
+            />
+            <ServiceCard
+              title="Plagiarism Checker"
+              description="Free plagiarism detection tool. Paste text or upload a document to instantly check originality against web sources."
+              icon={HiShieldCheck}
+              href="/plagiarism-checker"
+              features={['Instant Analysis', 'PDF & DOCX Support', 'Source Detection']}
             />
           </div>
         </div>

@@ -10,9 +10,15 @@ const services = [
     { name: 'Essay & Project Help', href: '/services/essay-project' },
 ];
 
+const tools = [
+    { name: 'Plagiarism Checker', href: '/plagiarism-checker' },
+    { name: 'AI Content Detector', href: '/ai-detector' },
+];
+
 const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services', children: services },
+    { name: 'Tools', href: '/plagiarism-checker', children: tools },
     { name: 'Confidentiality', href: '/confidentiality' },
     { name: 'Blog', href: '/blog' },
     { name: 'About', href: '/about' },
@@ -22,11 +28,11 @@ const navLinks = [
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const [servicesOpen, setServicesOpen] = useState(false);
+    const [servicesOpen, setServicesOpen] = useState<string | null>(null);
     const pathname = usePathname();
 
     // Pages with dark hero backgrounds that need transparent navbar
-    const darkHeroPages = ['/', '/services', '/services/thesis', '/services/research-paper', '/services/essay-project', '/confidentiality', '/contact', '/about'];
+    const darkHeroPages = ['/', '/services', '/services/thesis', '/services/research-paper', '/services/essay-project', '/confidentiality', '/contact', '/about', '/plagiarism-checker', '/ai-detector'];
     const hasDarkHero = darkHeroPages.some(p => pathname === p);
     const showSolid = scrolled || !hasDarkHero;
 
@@ -38,7 +44,7 @@ export default function Navbar() {
 
     useEffect(() => {
         setIsOpen(false);
-        setServicesOpen(false);
+        setServicesOpen(null);
     }, [pathname]);
 
     if (pathname?.startsWith('/admin')) return null;
@@ -133,13 +139,13 @@ export default function Navbar() {
                                 {link.children ? (
                                     <>
                                         <button
-                                            onClick={() => setServicesOpen(!servicesOpen)}
+                                            onClick={() => setServicesOpen(servicesOpen === link.name ? null : link.name)}
                                             className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-slate-700 hover:bg-primary-50 rounded-lg"
                                         >
                                             {link.name}
-                                            <HiChevronDown className={`w-4 h-4 transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
+                                            <HiChevronDown className={`w-4 h-4 transition-transform ${servicesOpen === link.name ? 'rotate-180' : ''}`} />
                                         </button>
-                                        {servicesOpen && (
+                                        {servicesOpen === link.name && (
                                             <div className="ml-4 space-y-1">
                                                 {link.children.map((child) => (
                                                     <Link

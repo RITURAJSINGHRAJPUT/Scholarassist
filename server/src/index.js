@@ -11,6 +11,8 @@ const blogRoutes = require('./routes/blogRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
+const plagiarismRoutes = require('./routes/plagiarismRoutes');
+const aiDetectorRoutes = require('./routes/aiDetectorRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +45,8 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/plagiarism', plagiarismRoutes);
+app.use('/api/ai-detector', aiDetectorRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
