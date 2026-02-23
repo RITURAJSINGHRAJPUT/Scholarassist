@@ -6,7 +6,7 @@ import { generateSEO, generateServiceSchema } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEO({
     title: 'Academic Services',
-    description: 'Comprehensive academic support services including thesis assistance, research paper support, and essay & project help.',
+    description: 'Comprehensive academic support services including thesis assistance, research paper support, and academic project support.',
     path: '/services',
 });
 
@@ -43,7 +43,7 @@ export default function ServicesPage() {
                             features={['Research Question Development', 'Statistical Analysis Guidance', 'APA/MLA/Chicago Formatting', 'Peer Review Preparation', 'Publication Strategy']}
                         />
                         <ServiceCard
-                            title="Essay & Project Help"
+                            title="Academic Project Support"
                             description="Expert assistance with essays, assignments, and project documentation across all academic disciplines and levels."
                             icon={HiPencilAlt}
                             href="/services/essay-project"

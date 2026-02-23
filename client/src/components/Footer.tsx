@@ -70,7 +70,7 @@ export default function Footer() {
                         <ul className="space-y-3 text-sm text-slate-400">
                             <li><Link href="/services/thesis" className="hover:text-primary-400 transition-colors">Thesis Assistance</Link></li>
                             <li><Link href="/services/research-paper" className="hover:text-primary-400 transition-colors">Research Paper Support</Link></li>
-                            <li><Link href="/services/essay-project" className="hover:text-primary-400 transition-colors">Essay & Project Help</Link></li>
+                            <li><Link href="/services/essay-project" className="hover:text-primary-400 transition-colors">Academic Project Support</Link></li>
                             <li><Link href="/consultation" className="hover:text-primary-400 transition-colors">Free Consultation</Link></li>
                         </ul>
                     </div>

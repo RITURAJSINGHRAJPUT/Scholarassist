@@ -7,7 +7,7 @@ import { HiMenu, HiX, HiChevronDown } from 'react-icons/hi';
 const services = [
     { name: 'Thesis Assistance', href: '/services/thesis' },
     { name: 'Research Paper Support', href: '/services/research-paper' },
-    { name: 'Essay & Project Help', href: '/services/essay-project' },
+    { name: 'Academic Project Support', href: '/services/essay-project' },
 ];
 
 const tools = [

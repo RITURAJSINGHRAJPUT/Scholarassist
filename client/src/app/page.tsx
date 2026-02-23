@@ -129,7 +129,7 @@ export default function HomePage() {
               features={['Data Analysis Guidance', 'Citation & Formatting', 'Peer Review Preparation']}
             />
             <ServiceCard
-              title="Essay & Project Help"
+              title="Academic Project Support"
               description="Professional guidance for essays, assignments, and project documentation across all academic disciplines."
               icon={HiPencilAlt}
               href="/services/essay-project"
