@@ -16,7 +16,11 @@
 - **Testimonials** — Student reviews displayed on the homepage
 - **Responsive design** — Works beautifully on desktop, tablet, and mobile
 
-### 🔐 Admin Panel
+### �️ Free Tools
+- **AI Content Detector** — Free tool utilizing Hugging Face's RoBERTa model to detect AI-generated content (ChatGPT, Claude, etc.)
+- **Plagiarism Checker** — Free tool utilizing web search to analyze text for originality and academic integrity
+
+### �🔐 Admin Panel
 - **Dashboard** — Overview of inquiries, blog posts, and site analytics
 - **Inquiry management** — View, respond to, and export student inquiries
 - **Blog management** — Create, edit, publish/unpublish posts with image uploads
@@ -76,11 +80,12 @@ psql -U postgres -d scholarassist -f server/db/schema.sql
 cp server/.env.example server/.env
 ```
 
-Edit `server/.env` with your database credentials:
+Edit `server/.env` with your database credentials and optional API tokens:
 ```env
 DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/scholarassist
 JWT_SECRET=your-secret-key
 CLIENT_URL=http://localhost:3000
+HUGGINGFACE_API_TOKEN=your_hugging_face_token  # Optional, for AI Detector
 ```
 
 ### 4. Run
@@ -145,6 +150,9 @@ ScholarSync/
 | `GET` | `/api/testimonials` | List published testimonials |
 | `POST` | `/api/inquiries` | Submit consultation inquiry |
 | `POST` | `/api/contact` | Submit contact message |
+| `POST` | `/api/ai-detector/check` | Analyze text/file for AI generation |
+| `POST` | `/api/plagiarism/check` | Analyze text/file for plagiarism |
+| `GET` | `/api/analytics/dashboard`| Admin analytics dashboard |
 
 > Admin endpoints require JWT authentication. See [HOSTING_GUIDE.md](HOSTING_GUIDE.md) for details.
 
