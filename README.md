@@ -162,7 +162,7 @@ ScholarSync/
 
 See the full [Hosting Guide](HOSTING_GUIDE.md) for step-by-step deployment instructions:
 
-- **Free tier** — Vercel (frontend) + Render (backend) + Supabase (database)
+- **Free tier** — Netlify (frontend) + Render (backend) + Supabase (database)
 - **VPS** — DigitalOcean / Hetzner with Nginx + PM2 + Let's Encrypt SSL
 
 ---
