@@ -1,0 +1,10 @@
+{
+  "name": "scholarassist-main",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix client && npm install --prefix server",
+    "dev": "npx -y concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "start": "npx -y concurrently \"npm start --prefix server\" \"npm start --prefix client\""
+  }
+}
