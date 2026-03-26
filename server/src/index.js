@@ -13,6 +13,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const plagiarismRoutes = require('./routes/plagiarismRoutes');
 const aiDetectorRoutes = require('./routes/aiDetectorRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,6 +48,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/plagiarism', plagiarismRoutes);
 app.use('/api/ai-detector', aiDetectorRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

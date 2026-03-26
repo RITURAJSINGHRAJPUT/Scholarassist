@@ -11,22 +11,6 @@ export default function Footer() {
 
     return (
         <footer className="bg-primary-950 text-white">
-            {/* CTA Bar */}
-            <div className="bg-gradient-to-r from-primary-700 to-primary-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div>
-                        <h3 className="text-2xl font-bold font-[var(--font-heading)]">Ready to Excel Academically?</h3>
-                        <p className="text-primary-200 mt-1">Get expert guidance for your academic projects today.</p>
-                    </div>
-                    <Link
-                        href="/consultation"
-                        className="px-8 py-3.5 bg-white text-primary-800 font-semibold rounded-xl hover:bg-primary-50 transition-all shadow-lg hover:-translate-y-0.5"
-                    >
-                        Start Your Consultation
-                    </Link>
-                </div>
-            </div>
-
             {/* Main Footer */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">

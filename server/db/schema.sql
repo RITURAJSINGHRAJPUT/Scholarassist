@@ -133,3 +133,16 @@ CREATE TABLE IF NOT EXISTS document_fingerprints (
 );
 
 CREATE INDEX IF NOT EXISTS idx_document_fingerprints_hash ON document_fingerprints(document_hash);
+
+-- Research Paper Editor Documents
+CREATE TABLE IF NOT EXISTS documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES admin_users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL DEFAULT 'Untitled Document',
+  content JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_documents_user ON documents(user_id);
+CREATE INDEX IF NOT EXISTS idx_documents_updated ON documents(updated_at DESC);

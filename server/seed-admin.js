@@ -18,8 +18,8 @@ const NEW_EMAIL = 'admin@scholarassist.com';
 async function seedAdmin() {
     try {
         // Test connection
-        constVE = await pool.query('SELECT NOW()');
-        console.log('✓ Database connected:', constVE.rows[0].now);
+        const result = await pool.query('SELECT NOW()');
+        console.log('✓ Database connected:', result.rows[0].now);
 
         // Check if tables exist
         const tables = await pool.query(`

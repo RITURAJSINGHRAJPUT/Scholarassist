@@ -13,6 +13,7 @@ const services = [
 const tools = [
     { name: 'Plagiarism Checker', href: '/plagiarism-checker' },
     { name: 'AI Content Detector', href: '/ai-detector' },
+    { name: 'Research Editor', href: '/editor' },
 ];
 
 const navLinks = [
@@ -47,7 +48,7 @@ export default function Navbar() {
         setServicesOpen(null);
     }, [pathname]);
 
-    if (pathname?.startsWith('/admin')) return null;
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/editor')) return null;
 
     return (
         <nav
