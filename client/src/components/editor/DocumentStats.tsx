@@ -6,6 +6,21 @@ interface DocumentStatsProps {
     editor: Editor | null;
 }
 
+const PRESET_CITATIONS = [
+    {
+        id: '1',
+        author: 'Chen, X., & Roberts, J.',
+        year: '2022',
+        title: 'Spatial Immersion and Cognitive Load in Virtual Reality Learning Environments.'
+    },
+    {
+        id: '2',
+        author: 'Damasio, A.',
+        year: '2018',
+        title: 'The Strange Order of Things: Life, Feeling, and the Making of Cultures.'
+    }
+];
+
 export default function DocumentStats({ editor }: DocumentStatsProps) {
     if (!editor) return null;
 
@@ -22,14 +37,14 @@ export default function DocumentStats({ editor }: DocumentStatsProps) {
         ? editorElement.querySelectorAll('h1, h2, h3').length
         : 0;
 
-    const stats = [
-        { label: 'Words', value: words.toLocaleString() },
-        { label: 'Characters', value: characters.toLocaleString() },
-        { label: 'Sentences', value: sentences.toLocaleString() },
-        { label: 'Paragraphs', value: paragraphs.toLocaleString() },
-        { label: 'Sections', value: sections },
-        { label: 'Read Time', value: `${readTime} min` },
-    ];
+    const handleCite = (citation: typeof PRESET_CITATIONS[0]) => {
+        editor.chain().focus().setCitation({
+            id: citation.id,
+            author: citation.author,
+            year: citation.year,
+            title: citation.title
+        }).run();
+    };
 
     return (
         <aside className="w-72 bg-[#f8fafc] border-l border-slate-200 h-full overflow-y-auto flex-shrink-0 flex flex-col">
@@ -46,31 +61,39 @@ export default function DocumentStats({ editor }: DocumentStatsProps) {
                     </div>
 
                     <div className="space-y-3">
-                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                            <h4 className="text-xs font-bold text-slate-800 mb-1">
-                                Chen, X., & Roberts, J. (2022)
-                            </h4>
-                            <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                                Spatial Immersion and Cognitive Load in Virtual Reality Learning Environments.
-                            </p>
-                            <div className="flex items-center gap-3 mt-2 text-[10px] font-semibold text-primary-600">
-                                <button className="hover:text-primary-800">EDIT</button>
-                                <button className="hover:text-red-600 text-slate-400">REMOVE</button>
+                        {PRESET_CITATIONS.map((cit) => (
+                            <div key={cit.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-primary-200 transition-colors">
+                                <h4 className="text-xs font-bold text-slate-800 mb-1">
+                                    {cit.author} ({cit.year})
+                                </h4>
+                                <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                                    {cit.title}
+                                </p>
+                                <div className="flex items-center gap-3 mt-2 text-[10px] font-semibold text-primary-600">
+                                    <button 
+                                        onClick={() => handleCite(cit)}
+                                        className="hover:text-primary-800 bg-primary-50 px-2 py-0.5 rounded"
+                                    >
+                                        CITE
+                                    </button>
+                                    <button className="hover:text-red-600 text-slate-400">REMOVE</button>
+                                </div>
                             </div>
-                        </div>
-
-                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                            <h4 className="text-xs font-bold text-slate-800 mb-1">
-                                Damasio, A. (2018)
-                            </h4>
-                            <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                                The Strange Order of Things: Life, Feeling, and the Making of Cultures.
-                            </p>
-                            <div className="flex items-center gap-3 mt-2 text-[10px] font-semibold text-primary-600">
-                                <button className="hover:text-primary-800">EDIT</button>
-                                <button className="hover:text-red-600 text-slate-400">REMOVE</button>
-                            </div>
-                        </div>
+                        ))}
+                        
+                        <button 
+                            onClick={() => {
+                                const author = window.prompt('Enter author name:');
+                                const year = window.prompt('Enter year:');
+                                const title = window.prompt('Enter title:');
+                                if (author && year && title) {
+                                    handleCite({ id: Date.now().toString(), author, year, title });
+                                }
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-bold text-slate-400 hover:border-primary-300 hover:text-primary-500 transition-all flex items-center justify-center gap-2"
+                        >
+                            + ADD NEW CITATION
+                        </button>
                     </div>
                 </div>
 

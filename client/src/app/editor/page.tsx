@@ -11,6 +11,11 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { FontFamily } from '@tiptap/extension-font-family';
+import { Color } from '@tiptap/extension-color';
+import { FontSize } from '@/lib/editor/fontSize';
+import { Citation } from '@/lib/editor/citation';
 import Link from 'next/link';
 import { HiArrowLeft, HiPlus, HiTrash, HiDocumentText } from 'react-icons/hi';
 
@@ -113,6 +118,11 @@ export default function ResearchEditorPage() {
             Placeholder.configure({
                 placeholder: 'Start writing your research paper…',
             }),
+            TextStyle,
+            FontFamily,
+            Color,
+            FontSize,
+            Citation,
         ],
         []
     );

@@ -3,6 +3,7 @@
 import { Editor } from '@tiptap/react';
 import {
     HiCode,
+    HiOutlineBookOpen,
 } from 'react-icons/hi';
 
 interface ToolbarProps {
@@ -16,8 +17,24 @@ interface ToolbarButton {
     isActive?: boolean;
 }
 
+const FONTS = [
+    { label: 'Inter', value: 'Inter, sans-serif' },
+    { label: 'Newsreader', value: 'Newsreader, serif' },
+    { label: 'Roboto', value: 'Roboto, sans-serif' },
+    { label: 'Times New Roman', value: 'Times New Roman, serif' },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Courier New', value: 'Courier New, monospace' },
+];
+
+const FONT_SIZES = [
+    '8px', '9px', '10px', '11px', '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px', '48px', '60px', '72px'
+];
+
 export default function EditorToolbar({ editor }: ToolbarProps) {
     if (!editor) return null;
+
+    const currentFont = editor.getAttributes('textStyle').fontFamily || 'Inter, sans-serif';
+    const currentSize = editor.getAttributes('textStyle').fontSize || '16px';
 
     const buttonGroups: ToolbarButton[][] = [
         // Text formatting
@@ -124,6 +141,19 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
                 action: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
             },
             {
+                icon: <HiOutlineBookOpen className="w-4 h-4" />,
+                title: 'Insert Citation',
+                action: () => {
+                    const author = window.prompt('Enter author name:');
+                    const year = window.prompt('Enter year:');
+                    const title = window.prompt('Enter title:');
+                    if (author && year && title) {
+                        editor.chain().focus().setCitation({ id: Date.now().toString(), author, year, title }).run();
+                    }
+                },
+                isActive: editor.isActive('citation'),
+            },
+            {
                 icon: <span className="text-xs">🖼</span>,
                 title: 'Insert Image',
                 action: () => {
@@ -151,16 +181,34 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
 
     return (
         <div className="bg-white/80 backdrop-blur-md px-4 py-2 flex items-center gap-1 flex-wrap shadow-sm">
-            {/* Font Family (Mock) */}
-            <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 mr-2 cursor-pointer hover:bg-slate-50 transition">
-                <span className="font-serif">Newsreader</span>
-                <span className="text-[10px] ml-4 text-slate-400">▼</span>
+            {/* Font Family Dropdown */}
+            <div className="relative mr-2 group">
+                <select
+                    value={currentFont}
+                    onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()}
+                    className="appearance-none bg-white border border-slate-200 rounded-lg px-2 py-1.5 pr-8 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                >
+                    {FONTS.map(f => (
+                        <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                            {f.label}
+                        </option>
+                    ))}
+                </select>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none group-hover:text-slate-600 transition">▼</span>
             </div>
 
-            {/* Font Size (Mock) */}
-            <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 mr-2 cursor-pointer hover:bg-slate-50 transition">
-                <span>12</span>
-                <span className="text-[10px] ml-2 text-slate-400">▼</span>
+            {/* Font Size Dropdown */}
+            <div className="relative mr-2 group">
+                <select
+                    value={currentSize}
+                    onChange={(e) => editor.chain().focus().setFontSize(e.target.value).run()}
+                    className="appearance-none bg-white border border-slate-200 rounded-lg px-2 py-1.5 pr-6 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                >
+                    {FONT_SIZES.map(s => (
+                        <option key={s} value={s}>{s.replace('px', '')}</option>
+                    ))}
+                </select>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none group-hover:text-slate-600 transition">▼</span>
             </div>
 
             <div className="w-px h-5 bg-slate-200 mx-1" />
