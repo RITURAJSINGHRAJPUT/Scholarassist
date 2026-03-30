@@ -10,7 +10,18 @@ declare module '@tiptap/core' {
       /**
        * Add a citation
        */
-      setCitation: (attributes: { id: string, author: string, year: string, title: string }) => ReturnType;
+      setCitation: (attributes: { 
+        id: string, 
+        author: string, 
+        year: string, 
+        title: string, 
+        type?: string,
+        journal?: string,
+        doi?: string,
+        volumeIssue?: string,
+        pages?: string,
+        number?: number 
+      }) => ReturnType;
     };
   }
 }
@@ -42,6 +53,24 @@ export const Citation = Node.create<CitationOptions>({
       title: {
         default: null,
       },
+      type: {
+        default: 'Journal',
+      },
+      journal: {
+        default: null,
+      },
+      doi: {
+        default: null,
+      },
+      volumeIssue: {
+        default: null,
+      },
+      pages: {
+        default: null,
+      },
+      number: {
+        default: 1,
+      },
     };
   },
 
@@ -58,9 +87,9 @@ export const Citation = Node.create<CitationOptions>({
       'span',
       mergeAttributes(HTMLAttributes, {
         'data-type': 'citation',
-        class: 'bg-primary-50 text-primary-700 px-1 rounded cursor-pointer hover:bg-primary-100 transition-colors border border-primary-200 text-[10px] font-bold mx-0.5 align-top',
+        class: 'cursor-pointer hover:underline antialiased',
       }),
-      `${HTMLAttributes.author}, ${HTMLAttributes.year}`,
+      `[${HTMLAttributes.number}]`,
     ];
   },
 

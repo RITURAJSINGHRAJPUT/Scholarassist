@@ -193,7 +193,7 @@ select:focus {
 
 /* ===== TipTap Editor Styles ===== */
 .ProseMirror {
-  font-family: 'Newsreader', 'Times New Roman', serif;
+  font-family: var(--font-serif), 'Newsreader', 'Times New Roman', serif;
   font-size: 16px;
   line-height: 2;
   color: #1e293b;
@@ -303,6 +303,28 @@ select:focus {
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+}
+
+.ProseMirror [data-type="citation"] {
+  background-color: #f1f5f9;
+  color: #1e40af;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.85em;
+  border-bottom: 2px solid #3b82f6;
+  margin: 0 0.1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.ProseMirror [data-type="citation"]:hover {
+  background-color: #dbeafe;
+  border-bottom-color: #1d4ed8;
 }
 
 .ProseMirror:focus {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Playfair_Display, Newsreader, Roboto as RobotoFont } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -14,6 +14,19 @@ const inter = Inter({
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-heading',
+  display: 'swap',
+});
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const roboto = RobotoFont({
+  subsets: ['latin'],
+  weight: ['100', '300', '400', '500', '700', '900'],
+  variable: '--font-roboto',
   display: 'swap',
 });
 
@@ -55,7 +68,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} font-[var(--font-body)] antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} ${newsreader.variable} ${roboto.variable} font-[var(--font-body)] antialiased`}>
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />

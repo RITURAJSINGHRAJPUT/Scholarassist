@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
+import { getImageUrl } from '@/lib/imageUtils';
 
 interface Post {
     id: string;
@@ -16,7 +17,7 @@ interface Post {
     featured_image?: string;
 }
 
-const API_BASE = 'http://localhost:5000';
+// No longer hardcoding API_BASE here since it's handled by imageUtils
 
 export default function BlogPostPage() {
     const params = useParams();
@@ -83,7 +84,7 @@ export default function BlogPostPage() {
                     {post.featured_image && (
                         <div className="mb-8">
                             <img
-                                src={`${API_BASE}${post.featured_image}`}
+                                src={getImageUrl(post.featured_image)}
                                 alt={post.title}
                                 className="w-full h-80 object-cover rounded-2xl shadow-sm"
                             />

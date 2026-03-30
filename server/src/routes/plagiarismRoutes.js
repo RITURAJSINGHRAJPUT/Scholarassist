@@ -79,11 +79,21 @@ async function searchWeb(query) {
     try {
         const searchQuery = encodeURIComponent(query.slice(0, 150));
         const crossrefUrl = `https://api.crossref.org/works?query=${searchQuery}&rows=5`;
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@scholarassist.com';
 
-        const response = await fetch(crossrefUrl);
-        const data = await response.json();
+        const response = await fetch(crossrefUrl, {
+            headers: {
+                'User-Agent': `ScholarAssist/1.0 (https://scholarassist.com; mailto:${adminEmail})`,
+            }
+        });
 
-        if (data.message?.items) {
+        if (!response.ok) {
+            console.warn(`CrossRef search failed (${response.status}): ${response.statusText}`);
+            return urls;
+        }
+
+        const data = await response.json().catch(() => null);
+        if (data && data.message?.items) {
             for (const item of data.message.items) {
                 if (item.URL) urls.push(item.URL);
             }
@@ -136,12 +146,27 @@ async function fetchPageContent(url) {
     }
 }
 
+const STOP_WORDS = new Set(['a', 'an', 'the', 'and', 'or', 'but', 'if', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing']);
+
+function cleanTextForSimilarity(text) {
+    return text.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !STOP_WORDS.has(w))
+        .join(' ');
+}
+
 // ════════════════════════════════════════════════════
-// SIMILARITY — Cosine + N-Gram
+// SIMILARITY — Cosine + N-Gram (with Stop-Word Filtering)
 // ════════════════════════════════════════════════════
 function calculateSimilarity(text1, text2) {
-    const words1 = text1.toLowerCase().split(/\s+/);
-    const words2 = text2.toLowerCase().split(/\s+/);
+    const cleaned1 = cleanTextForSimilarity(text1);
+    const cleaned2 = cleanTextForSimilarity(text2);
+    
+    if (cleaned1.length < 5 || cleaned2.length < 5) return 0;
+
+    const words1 = cleaned1.split(/\s+/);
+    const words2 = cleaned2.split(/\s+/);
 
     const allWords = [...new Set([...words1, ...words2])];
 
@@ -156,10 +181,12 @@ function calculateSimilarity(text1, text2) {
     return dotProduct / (magnitude1 * magnitude2);
 }
 
-function nGramSimilarity(text1, text2, n = 5) {
+function nGramSimilarity(text1, text2, n = 3) { // Reduced n for better fuzzy matching
     const createNGrams = (text) => {
-        const words = text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+        const cleaned = cleanTextForSimilarity(text);
+        const words = cleaned.split(/\s+/);
         const ngrams = new Set();
+        if (words.length < n) return ngrams;
         for (let i = 0; i <= words.length - n; i++) {
             ngrams.add(words.slice(i, i + n).join(' '));
         }
@@ -227,54 +254,68 @@ router.post('/check', upload.single('file'), async (req, res) => {
             return res.status(400).json({ error: 'Not enough sentences for analysis.' });
         }
 
-        // Check up to 20 sentences (balance speed vs thoroughness)
-        const limit = Math.min(sentences.length, 100);
+        // Dynamic sentence limit based on word count (scale from 15 to 150)
+        let maxSentencesToCheck = 15;
+        if (wordCount > 4000) maxSentencesToCheck = 150;
+        else if (wordCount > 2000) maxSentencesToCheck = 100;
+        else if (wordCount > 500) maxSentencesToCheck = 40;
+
+        // Intelligent Sentence Selection (Rank by Information Density)
+        const rankedSentences = sentences
+            .map(s => {
+                const words = s.toLowerCase().split(/\s+/).filter(w => !STOP_WORDS.has(w));
+                const density = (words.length * new Set(words).size) / (s.length || 1);
+                return { text: s, density };
+            })
+            .sort((a, b) => b.density - a.density)
+            .slice(0, maxSentencesToCheck)
+            .map(item => item.text);
+
         const results = [];
+        console.log(`[Plagiarism] ULTRA ANALYSIS: Checking ${rankedSentences.length} segments with 10 concurrent threads...`);
 
-        for (let i = 0; i < limit; i++) {
-            const sentence = sentences[i];
-            console.log(`[Plagiarism] Checking ${i + 1}/${limit}: "${sentence.substring(0, 50)}..."`);
+        // Concurrent processing with a limit (batching)
+        const concurrencyLimit = 10;
+        for (let i = 0; i < rankedSentences.length; i += concurrencyLimit) {
+            const batch = rankedSentences.slice(i, i + concurrencyLimit);
+            
+            const batchResults = await Promise.all(batch.map(async (sentence) => {
+                const urls = await searchWeb(sentence);
+                let maxSimilarity = 0;
+                const matchedSources = [];
 
-            const urls = await searchWeb(sentence);
-            console.log(`  Found ${urls.length} URLs to check`);
+                for (const url of urls) {
+                    const content = await fetchPageContent(url);
+                    if (content && content.length > 200) { // Increased min content length for better accuracy
+                        const cosineSim = calculateSimilarity(sentence, content);
+                        const ngramSim = nGramSimilarity(sentence, content, 5);
+                        const similarity = Math.max(cosineSim, ngramSim);
 
-            let maxSimilarity = 0;
-            const matchedSources = [];
+                        if (similarity > maxSimilarity) {
+                            maxSimilarity = similarity;
+                        }
 
-            for (const url of urls) {
-                const content = await fetchPageContent(url);
-                if (content && content.length > 100) {
-                    const cosineSim = calculateSimilarity(sentence, content);
-                    const ngramSim = nGramSimilarity(sentence, content, 5);
-                    const similarity = Math.max(cosineSim, ngramSim);
-
-                    if (similarity > maxSimilarity) {
-                        maxSimilarity = similarity;
-                    }
-
-                    if (similarity > 0.15) {
-                        matchedSources.push({
-                            url,
-                            title: extractTitleFromUrl(url),
-                            similarity: Math.round(similarity * 100),
-                        });
+                        if (similarity > 0.15) {
+                            matchedSources.push({
+                                url,
+                                title: extractTitleFromUrl(url),
+                                similarity: Math.round(similarity * 100),
+                            });
+                        }
                     }
                 }
-            }
 
-            matchedSources.sort((a, b) => b.similarity - a.similarity);
+                matchedSources.sort((a, b) => b.similarity - a.similarity);
 
-            results.push({
-                text: sentence,
-                similarity: Math.round(maxSimilarity * 100),
-                sources: matchedSources.slice(0, 3), // top 3 sources per sentence
-                isPlagiarized: maxSimilarity > 0.5,
-            });
+                return {
+                    text: sentence,
+                    similarity: Math.round(maxSimilarity * 100),
+                    sources: matchedSources.slice(0, 3),
+                    isPlagiarized: maxSimilarity > 0.5,
+                };
+            }));
 
-            // Rate limiting — 1s delay between searches
-            if (i < limit - 1) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            results.push(...batchResults);
         }
 
         // Calculate overall score
@@ -314,6 +355,7 @@ router.post('/check', upload.single('file'), async (req, res) => {
             sentencesAnalyzed: results.length,
             totalSentences: sentences.length,
             flaggedSentences,
+            text,
         });
     } catch (err) {
         console.error('Plagiarism check error:', err);

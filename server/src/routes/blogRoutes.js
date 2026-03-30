@@ -27,6 +27,35 @@ function generateSlug(title) {
 
 // ==================== PUBLIC ROUTES ====================
 
+// GET /api/blog/proxy-image?id=FILE_ID - Proxy for Google Drive images to bypass CORS
+router.get('/proxy-image', async (req, res) => {
+    try {
+        const { id } = req.query;
+        if (!id) return res.status(400).json({ error: 'Image ID is required' });
+
+        // Using lh3.googleusercontent.com/d/ID as it's the most robust direct link
+        const googleUrl = `https://lh3.googleusercontent.com/d/${id}`;
+
+        const response = await fetch(googleUrl);
+        if (!response.ok) {
+            console.error(`Google Proxy Error: ${response.status} ${response.statusText}`);
+            return res.status(response.status).json({ error: 'Failed to fetch image from Google' });
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (contentType) res.setHeader('Content-Type', contentType);
+
+        // Optional: Cache headers
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+
+        const arrayBuffer = await response.arrayBuffer();
+        res.send(Buffer.from(arrayBuffer));
+    } catch (error) {
+        console.error('Image proxy error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // GET /api/blog/posts - List published posts
 router.get('/posts', validatePagination, handleValidationErrors, async (req, res) => {
     try {

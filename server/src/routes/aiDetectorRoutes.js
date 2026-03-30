@@ -496,6 +496,7 @@ router.post('/check', upload.single('file'), async (req, res) => {
                 wordLength: { label: 'Word Length Uniformity', weight: weights.wordLength, ...wordLength },
             },
             highlightedSentences,
+            text, // Added text to response
         });
     } catch (err) {
         console.error('AI Detection error:', err);

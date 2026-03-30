@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/imageUtils';
 
 interface BlogCardProps {
     title: string;
@@ -8,13 +9,6 @@ interface BlogCardProps {
     date: string;
     author?: string;
     featured_image?: string;
-}
-
-function getImageUrl(path: string): string {
-    const base = typeof window !== 'undefined'
-        ? (process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000')
-        : 'http://localhost:5000';
-    return `${base}${path}`;
 }
 
 export default function BlogCard({ title, excerpt, slug, category, date, author, featured_image }: BlogCardProps) {
