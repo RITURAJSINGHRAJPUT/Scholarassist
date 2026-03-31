@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api')
+    .trim()
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Scrub invisible control characters
+
 
 const api = axios.create({
     baseURL: API_BASE_URL,
