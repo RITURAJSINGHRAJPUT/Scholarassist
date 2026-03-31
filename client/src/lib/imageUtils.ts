@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:5001';
+import { API_BASE_URL } from './api';
+
+const API_BASE = API_BASE_URL.replace(/\/api$/, '');
 
 /**
  * Converts various Google Drive link formats to a direct image source URL.
