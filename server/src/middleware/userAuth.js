@@ -42,6 +42,7 @@ async function authenticateUser(req, res, next) {
         req.user = user;
         next();
     } catch (error) {
+        console.error('Authentication Error Catch:', error.message);
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ error: 'Session expired. Please login again.' });
         }
@@ -75,7 +76,8 @@ async function optionalAuth(req, res, next) {
 
         req.user = result.rows.length > 0 ? result.rows[0] : null;
         next();
-    } catch {
+    } catch (error) {
+        console.error('Optional Auth Error Catch:', error.message);
         req.user = null;
         next();
     }
