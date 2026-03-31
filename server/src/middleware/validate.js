@@ -208,6 +208,60 @@ const validateTestimonial = [
     handleValidationErrors,
 ];
 
+const validateUserTestimonial = [
+    body('content')
+        .trim()
+        .notEmpty().withMessage('Testimonial text is required')
+        .isLength({ min: 20, max: 500 }).withMessage('Testimonial must be between 20 and 500 characters'),
+    body('rating')
+        .notEmpty().withMessage('Rating is required')
+        .isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5')
+        .toInt(),
+    handleValidationErrors,
+];
+
+// ==================== USER AUTH VALIDATORS ====================
+
+const validateUserSignup = [
+    body('name')
+        .trim()
+        .notEmpty().withMessage('Name is required')
+        .isLength({ min: 2, max: 100 }).withMessage('Name must be 2-100 characters'),
+    body('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .isLength({ max: 255 }).withMessage('Email too long')
+        .normalizeEmail(),
+    body('password')
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 6, max: 100 }).withMessage('Password must be 6-100 characters'),
+    body('phone')
+        .optional({ values: 'falsy' })
+        .trim()
+        .isLength({ max: 20 }).withMessage('Phone too long'),
+    body('designation')
+        .optional({ values: 'falsy' })
+        .trim()
+        .isLength({ max: 100 }).withMessage('Designation too long'),
+    body('place_of_work')
+        .optional({ values: 'falsy' })
+        .trim()
+        .isLength({ max: 255 }).withMessage('Place of work too long'),
+    handleValidationErrors,
+];
+
+const validateUserLogin = [
+    body('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .normalizeEmail(),
+    body('password')
+        .notEmpty().withMessage('Password is required'),
+    handleValidationErrors,
+];
+
 module.exports = {
     handleValidationErrors,
     validateUUID,
@@ -220,4 +274,7 @@ module.exports = {
     validateBlogPost,
     validateBlogCategory,
     validateTestimonial,
+    validateUserTestimonial,
+    validateUserSignup,
+    validateUserLogin,
 };

@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
+const { authenticateUser, checkUsageLimit, incrementUsage } = require('../middleware/userAuth');
 
 // Hugging Face Inference API config
 const { HfInference } = require('@huggingface/inference');
@@ -339,7 +340,7 @@ function highlightSuspiciousSentences(sentences) {
 }
 
 // ─── POST /check — Main AI detection endpoint ───
-router.post('/check', upload.single('file'), async (req, res) => {
+router.post('/check', authenticateUser, checkUsageLimit('ai_detector'), upload.single('file'), async (req, res) => {
     try {
         let text = '';
 
@@ -480,6 +481,11 @@ router.post('/check', upload.single('file'), async (req, res) => {
         // Get highlighted suspicious sentences
         const highlightedSentences = highlightSuspiciousSentences(sentences);
 
+        // Increment usage for free users
+        if (req.user && !req.user.is_premium) {
+            await incrementUsage(req.user.id, 'ai_detector');
+        }
+
         res.json({
             score: overallScore,
             verdict,
@@ -496,7 +502,7 @@ router.post('/check', upload.single('file'), async (req, res) => {
                 wordLength: { label: 'Word Length Uniformity', weight: weights.wordLength, ...wordLength },
             },
             highlightedSentences,
-            text, // Added text to response
+            text,
         });
     } catch (err) {
         console.error('AI Detection error:', err);

@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
+const { authenticateUser, checkUsageLimit, incrementUsage } = require('../middleware/userAuth');
 
 // File upload config (in-memory for text extraction)
 const upload = multer({
@@ -230,7 +231,7 @@ function extractTitleFromUrl(url) {
 // ════════════════════════════════════════════════════
 // POST /check — Main plagiarism check endpoint
 // ════════════════════════════════════════════════════
-router.post('/check', upload.single('file'), async (req, res) => {
+router.post('/check', authenticateUser, checkUsageLimit('plagiarism'), upload.single('file'), async (req, res) => {
     try {
         let text = '';
 
@@ -345,6 +346,11 @@ router.post('/check', upload.single('file'), async (req, res) => {
         } else {
             verdict = 'original';
             verdictLabel = 'Original Content';
+        }
+
+        // Increment usage for free users
+        if (req.user && !req.user.is_premium) {
+            await incrementUsage(req.user.id, 'plagiarism');
         }
 
         res.json({

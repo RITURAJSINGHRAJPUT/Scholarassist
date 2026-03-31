@@ -111,12 +111,15 @@ CREATE INDEX idx_uploaded_files_inquiry ON uploaded_files(inquiry_id);
 -- Testimonials
 CREATE TABLE testimonials (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES app_users(id) ON DELETE SET NULL,
   name VARCHAR(255) NOT NULL,
   role VARCHAR(255),
   content TEXT NOT NULL,
   rating INTEGER DEFAULT 5,
+  status VARCHAR(20) DEFAULT 'pending',
   published BOOLEAN DEFAULT true,
   display_order INTEGER DEFAULT 0,
+  approved_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -146,3 +149,37 @@ CREATE TABLE IF NOT EXISTS documents (
 
 CREATE INDEX IF NOT EXISTS idx_documents_user ON documents(user_id);
 CREATE INDEX IF NOT EXISTS idx_documents_updated ON documents(updated_at DESC);
+
+-- ================================================================
+-- App Users (public-facing, separate from admin_users)
+-- ================================================================
+CREATE TABLE IF NOT EXISTS app_users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
+  designation VARCHAR(100),
+  place_of_work VARCHAR(255),
+  is_premium BOOLEAN DEFAULT false,
+  premium_status VARCHAR(20) DEFAULT 'none',
+  requested_plan VARCHAR(20),
+  subscription_expiry TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_users_email ON app_users(email);
+
+-- Daily Usage Tracking
+CREATE TABLE IF NOT EXISTS usage_tracking (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES app_users(id) ON DELETE CASCADE,
+  usage_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  plagiarism_count INTEGER DEFAULT 0,
+  ai_detector_count INTEGER DEFAULT 0,
+  editor_count INTEGER DEFAULT 0,
+  UNIQUE(user_id, usage_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_date ON usage_tracking(user_id, usage_date);
