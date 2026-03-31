@@ -2,11 +2,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { HiHome, HiInbox, HiPencilAlt, HiLogout, HiMenu, HiX, HiStar } from 'react-icons/hi';
+import { HiHome, HiInbox, HiPencilAlt, HiLogout, HiMenu, HiX, HiStar, HiUserGroup } from 'react-icons/hi';
 
 const navItems = [
     { name: 'Dashboard', href: '/admin', icon: HiHome },
     { name: 'Inquiries', href: '/admin/inquiries', icon: HiInbox },
+    { name: 'Users', href: '/admin/users', icon: HiUserGroup },
     { name: 'Blog', href: '/admin/blog', icon: HiPencilAlt },
     { name: 'Testimonials', href: '/admin/testimonials', icon: HiStar },
 ];

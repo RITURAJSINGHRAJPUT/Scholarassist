@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { generateOrganizationSchema } from '@/lib/seo';
+import AuthWrapper from '@/components/AuthWrapper';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -69,9 +70,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${newsreader.variable} ${roboto.variable} font-[var(--font-body)] antialiased`}>
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <AuthWrapper>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </AuthWrapper>
       </body>
     </html>
   );

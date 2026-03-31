@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { HiShieldCheck, HiUpload, HiDocumentText, HiX, HiExternalLink, HiExclamation, HiCheckCircle } from 'react-icons/hi';
 import FAQAccordion from '@/components/FAQAccordion';
 import api from '@/lib/api';
+import ProtectedToolWrapper from '@/components/ProtectedToolWrapper';
+import UsageIndicator from '@/components/UsageIndicator';
+import { useAuth } from '@/lib/AuthContext';
 
 const faqs = [
     { question: 'How does the plagiarism checker work?', answer: 'Our tool performs a deep scan of your document, selecting representative sentences and cross-referencing them against billions of web pages and academic databases using advanced concurrent analysis.' },
@@ -33,6 +36,7 @@ interface CheckResult {
 
 export default function PlagiarismCheckerPage() {
     const router = useRouter();
+    const { isAuthenticated, refreshUsage, setShowUpgradeModal } = useAuth();
     const [activeTab, setActiveTab] = useState<'text' | 'file'>('text');
     const [text, setText] = useState('');
     const [file, setFile] = useState<File | null>(null);
@@ -106,13 +110,17 @@ export default function PlagiarismCheckerPage() {
             setTimeout(() => {
                 setResult(response.data);
                 setLoading(false);
+                refreshUsage();
                 setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
             }, 400);
         } catch (err: unknown) {
             clearInterval(progressInterval);
             setLoading(false);
             setProgress(0);
-            const axiosErr = err as { response?: { data?: { error?: string } } };
+            const axiosErr = err as { response?: { data?: { error?: string; code?: string } } };
+            if (axiosErr.response?.data?.code === 'USAGE_LIMIT_EXCEEDED') {
+                setShowUpgradeModal(true);
+            }
             setError(axiosErr.response?.data?.error || 'An error occurred. Please try again.');
         }
     };
@@ -152,8 +160,13 @@ export default function PlagiarismCheckerPage() {
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-white/90 text-sm mb-6">
                         <HiShieldCheck className="w-4 h-4" />
-                        Free Tool — No Login Required
+                        {isAuthenticated ? 'Logged In' : 'Login Required'}
                     </div>
+                    {isAuthenticated && (
+                        <div className="mb-4">
+                            <UsageIndicator />
+                        </div>
+                    )}
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 italic tracking-tight">Ultra Plagiarism Checker</h1>
                     <p className="text-primary-100 text-lg max-w-2xl mx-auto mb-8">
                         Deep-scanning technology with **85%+ accuracy**. Cross-reference up to 5,000 words against billions of sources with 150-point segment analysis.
@@ -171,6 +184,7 @@ export default function PlagiarismCheckerPage() {
 
             <section className="py-16 bg-slate-50">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <ProtectedToolWrapper toolName="plagiarism checker">
                     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
                         <div className="flex border-b border-slate-100">
                             <button
@@ -352,6 +366,7 @@ export default function PlagiarismCheckerPage() {
                             </div>
                         </div>
                     )}
+                  </ProtectedToolWrapper>
                 </div>
             </section>
 

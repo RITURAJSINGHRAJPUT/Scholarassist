@@ -7,7 +7,15 @@ import TestimonialCard from '@/components/TestimonialCard';
 import FAQAccordion from '@/components/FAQAccordion';
 import api from '@/lib/api';
 
-interface Testimonial { id: string; name: string; role: string; content: string; rating: number; }
+interface Testimonial { 
+  id: string; 
+  name: string; 
+  role: string; 
+  content: string; 
+  rating: number; 
+  premium_status?: string;
+  workspace?: string;
+}
 
 const faqs = [
   { question: 'What types of academic assistance do you provide?', answer: 'We provide expert guidance for thesis writing, research papers, essays, literature reviews, project documentation, and dissertation support across all academic levels from undergraduate to post-doctoral.' },
@@ -186,7 +194,14 @@ export default function HomePage() {
               <div className="flex flex-wrap justify-center gap-8">
                 {testimonials.map(t => (
                   <div key={t.id} className="w-[350px]">
-                    <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
+                    <TestimonialCard 
+                      name={t.name} 
+                      role={t.role} 
+                      content={t.content} 
+                      rating={t.rating} 
+                      premiumStatus={t.premium_status}
+                      workspace={t.workspace}
+                    />
                   </div>
                 ))}
               </div>
@@ -195,12 +210,26 @@ export default function HomePage() {
                 <div className="flex animate-scroll gap-8 w-max">
                   {testimonials.map(t => (
                     <div key={`original-${t.id}`} className="flex-shrink-0 w-[350px]">
-                      <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
+                      <TestimonialCard 
+                        name={t.name} 
+                        role={t.role} 
+                        content={t.content} 
+                        rating={t.rating} 
+                        premiumStatus={t.premium_status}
+                        workspace={t.workspace}
+                      />
                     </div>
                   ))}
                   {testimonials.map(t => (
                     <div key={`duplicate-${t.id}`} className="flex-shrink-0 w-[350px]">
-                      <TestimonialCard name={t.name} role={t.role} content={t.content} rating={t.rating} />
+                      <TestimonialCard 
+                        name={t.name} 
+                        role={t.role} 
+                        content={t.content} 
+                        rating={t.rating} 
+                        premiumStatus={t.premium_status}
+                        workspace={t.workspace}
+                      />
                     </div>
                   ))}
                 </div>

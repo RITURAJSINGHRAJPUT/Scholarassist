@@ -336,3 +336,40 @@ select:focus {
   border-top: 2px solid #e2e8f0;
   margin: 2em 0;
 }
+
+/* ===== Auth Modal Animations ===== */
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalContentIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.auth-modal-backdrop {
+  animation: modalBackdropIn 0.2s ease-out forwards;
+}
+
+.auth-modal-content {
+  animation: modalContentIn 0.3s ease-out forwards;
+}
+
+/* Premium badge shimmer */
+@keyframes premiumShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.premium-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: premiumShimmer 3s ease-in-out infinite;
+}

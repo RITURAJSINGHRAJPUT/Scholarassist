@@ -414,17 +414,8 @@ function EditorContentInternal() {
     // Document list view
     if (showDocList) {
         return (
-            <div className="flex flex-col min-h-screen bg-[#f8f9fc]">
-                <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center shadow-sm">
-                    <Link href="/" className="flex items-center gap-2 group hover:opacity-80 transition">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-sm">
-                            <span className="text-white font-bold text-sm">S</span>
-                        </div>
-                        <span className="text-xl font-bold text-primary-800">
-                            Scholar<span className="text-primary-500">Assist</span>
-                        </span>
-                    </Link>
-                </div>
+            <div className="flex flex-col min-h-screen bg-[#f8f9fc] pt-16">
+
 
                 <div className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
                     {/* Templates Section */}
@@ -542,8 +533,8 @@ function EditorContentInternal() {
     }
 
     return (
-        <div className="w-full h-screen">
-            <div className="flex flex-col h-full bg-[#f8fafc] border-t border-slate-200 overflow-hidden font-sans">
+        <div className="w-full h-screen pt-16">
+            <div className="flex flex-col h-full bg-[#f8fafc] overflow-hidden font-sans">
                 {/* Header */}
                 <div className="bg-[#f8fafc] border-b border-slate-200 px-6 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-6">
@@ -555,10 +546,10 @@ function EditorContentInternal() {
                                 }}
                                 className="flex items-center gap-2 group hover:opacity-80 transition"
                             >
-                                <div className="w-8 h-8 flex items-center justify-center bg-primary-600 text-white rounded-lg shadow-sm">
-                                    <span className="font-bold leading-none text-sm">S</span>
+                                <div className="w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg shadow-sm">
+                                    <span className="font-bold leading-none text-sm">E</span>
                                 </div>
-                                <span className="text-xl font-bold text-primary-800 hidden sm:block">ScholarAssist</span>
+                                <span className="text-sm font-black text-slate-400 hidden sm:block uppercase tracking-widest">Editor</span>
                             </button>
                             <div className="w-px h-6 bg-slate-200" />
                             <input
