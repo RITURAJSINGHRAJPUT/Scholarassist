@@ -35,10 +35,7 @@ router.get('/', async (req, res) => {
         res.json(result.rows);
     } catch (error) {
         console.error('Testimonial Fetch Error:', error.message);
-        res.status(500).json({ 
-            error: 'Internal server error',
-            details: error.message // Production X-Ray: reveal actual error temporarily
-        });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
