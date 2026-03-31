@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api')
     .trim()
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Scrub invisible control characters
+    .replace(/[^\x20-\x7E]/g, '') // Strip all non-ASCII characters (including emojis)
+    .replace(/\s/g, '');          // Strip any accidental spaces
 
 
 const api = axios.create({
