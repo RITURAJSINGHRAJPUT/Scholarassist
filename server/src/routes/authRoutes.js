@@ -42,8 +42,11 @@ router.post('/login', validateLogin, async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Admin Login Error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: error.message // Production X-Ray: reveal actual error temporarily
+        });
     }
 });
 
