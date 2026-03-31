@@ -51,8 +51,11 @@ router.post('/signup', validateUserSignup, async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Signup error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Signup Route Error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: error.message // Production X-Ray: reveal actual error temporarily
+        });
     }
 });
 
@@ -104,7 +107,7 @@ router.post('/login', validateUserLogin, async (req, res) => {
         console.error('Login Route Error:', error.message, error.stack);
         res.status(500).json({ 
             error: 'Internal server error',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined 
+            details: error.message // Production X-Ray: reveal actual error temporarily
         });
     }
 });
