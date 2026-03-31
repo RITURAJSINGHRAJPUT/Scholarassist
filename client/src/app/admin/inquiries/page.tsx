@@ -1,4 +1,6 @@
 'use client';
+'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { HiDownload, HiTrash, HiEye, HiDocumentDownload } from 'react-icons/hi';
