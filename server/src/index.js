@@ -32,9 +32,23 @@ if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('combined'));
 }
 
-// Health check
+// Enhanced Health & Diagnostic Check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    const requiredEnv = [
+        'DATABASE_URL', 'JWT_SECRET', 'CLIENT_URL', 
+        'RESEND_API_KEY', 'HUGGINGFACE_API_TOKEN'
+    ];
+    const missingEnv = requiredEnv.filter(key => !process.env[key]);
+    
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        diagnostics: {
+            missing_variables: missingEnv,
+            healthy: missingEnv.length === 0
+        }
+    });
 });
 
 // Serve uploaded files (blog images etc.)
