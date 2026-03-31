@@ -34,8 +34,11 @@ router.get('/', async (req, res) => {
         console.log('Testimonial Join Result:', result.rows);
         res.json(result.rows);
     } catch (error) {
-        console.error('List testimonials error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Testimonial Fetch Error:', error.message);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined 
+        });
     }
 });
 

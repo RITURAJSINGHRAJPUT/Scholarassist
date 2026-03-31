@@ -101,8 +101,11 @@ router.post('/login', validateUserLogin, async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Login Route Error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined 
+        });
     }
 });
 
