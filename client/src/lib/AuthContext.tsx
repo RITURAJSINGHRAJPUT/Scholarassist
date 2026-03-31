@@ -12,6 +12,7 @@ interface User {
     placeOfWork?: string;
     premiumStatus?: 'none' | 'pending' | 'approved' | 'rejected';
     requestedPlan?: 'monthly' | 'yearly';
+    isPremium?: boolean;
 }
 
 interface Usage {
