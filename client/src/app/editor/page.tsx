@@ -20,7 +20,6 @@ import { Color } from '@tiptap/extension-color';
 import { FontSize } from '@/lib/editor/fontSize';
 import { Citation } from '@/lib/editor/citation';
 import { LineHeight } from '@/lib/editor/lineHeight';
-import { AIHighlight } from '@/lib/editor/aiHighlight';
 import Link from 'next/link';
 import { 
     HiPlus, 
@@ -39,6 +38,8 @@ import SectionsSidebar, { DEFAULT_SECTIONS } from '@/components/editor/SectionsS
 import DocumentStats from '@/components/editor/DocumentStats';
 import { useDocuments, type DocumentListItem } from '@/lib/useDocuments';
 import { useAutoSave } from '@/lib/useAutoSave';
+import { useContentAnalysis } from '@/lib/useContentAnalysis';
+import HeatmapPreview from '@/components/editor/HeatmapPreview';
 
 const TEMPLATES = [
     {
@@ -162,6 +163,8 @@ function EditorContentInternal() {
     const [sections, setSections] = useState<string[]>(DEFAULT_SECTIONS);
     const [showDocList, setShowDocList] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [isHeatmapOpen, setIsHeatmapOpen] = useState(false);
+    const [editorText, setEditorText] = useState('');
 
     // Document Settings State
     const [margins, setMargins] = useState('STANDARD');
@@ -196,7 +199,6 @@ function EditorContentInternal() {
             LineHeight.configure({
                 defaultLineHeight: '1.5',
             }),
-            AIHighlight,
         ],
         []
     );
@@ -213,6 +215,7 @@ function EditorContentInternal() {
             },
         },
         onUpdate: ({ editor }) => {
+            setEditorText(editor.getText() || '');
             if (currentDocId) {
                 triggerSave({
                     title: currentTitle,
@@ -233,6 +236,8 @@ function EditorContentInternal() {
             setLoading(false);
         }
     }, [listDocuments]);
+
+    const contentData = useContentAnalysis(editorText);
 
     // Handle PDF Export
     const handleExportPDF = useCallback(async () => {
@@ -371,6 +376,7 @@ function EditorContentInternal() {
                 } else {
                     editor?.commands.setContent(DEFAULT_TEMPLATE_CONTENT);
                 }
+                setEditorText(editor?.getText() || '');
 
                 setShowDocList(false);
             } catch (error) {
@@ -585,18 +591,33 @@ function EditorContentInternal() {
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto pt-24 pb-12 px-8 flex justify-center custom-scrollbar focus-within:bg-[#f1f5f9] transition-colors duration-500">
-                            <div className="w-full max-w-[850px]">
-                                <div
-                                    className="bg-white rounded-sm mb-8"
-                                    style={{
-                                        minHeight: '1123px',
-                                        boxShadow: '0 12px 24px -4px rgba(0,0,0,0.1)',
-                                    }}
-                                >
-                                    <EditorContent editor={editor} />
+                        {/* Split Pane View Structure */}
+                        <div className="flex-1 flex overflow-hidden">
+                            {/* Editor Pane */}
+                            <div className={`flex-1 overflow-y-auto pt-24 pb-12 flex justify-center custom-scrollbar focus-within:bg-[#f1f5f9] transition-colors duration-500 ${isHeatmapOpen ? 'px-4' : 'px-8'}`}>
+                                <div className="w-full max-w-[850px]">
+                                    <div
+                                        className="bg-white rounded-sm mb-8"
+                                        style={{
+                                            minHeight: '1123px',
+                                            boxShadow: '0 12px 24px -4px rgba(0,0,0,0.1)',
+                                        }}
+                                    >
+                                        <EditorContent editor={editor} />
+                                    </div>
                                 </div>
                             </div>
+
+                            {/* Heatmap Pane */}
+                            {isHeatmapOpen && (
+                                <div className="w-1/2 h-full border-l border-slate-200 shadow-xl z-10 bg-white">
+                                    <HeatmapPreview 
+                                        aiResult={contentData.aiResult} 
+                                        isAnalyzing={contentData.isAnalyzing}
+                                        onClose={() => setIsHeatmapOpen(false)}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="bg-white border-t border-slate-200 px-4 py-2 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase z-20">
@@ -619,6 +640,9 @@ function EditorContentInternal() {
                         setLanguage={setLanguage}
                         lineHeight={lineHeight}
                         setLineHeight={setLineHeight}
+                        contentData={contentData}
+                        isHeatmapOpen={isHeatmapOpen}
+                        onToggleHeatmap={() => setIsHeatmapOpen(!isHeatmapOpen)}
                     />
                 </div>
             </div>

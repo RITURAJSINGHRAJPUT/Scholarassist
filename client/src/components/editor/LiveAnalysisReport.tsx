@@ -1,22 +1,31 @@
 'use client';
-import { useEffect } from 'react';
-import { useContentAnalysis } from '@/lib/useContentAnalysis';
-import { HiShieldCheck, HiSparkles, HiRefresh, HiCheckCircle, HiExclamation } from 'react-icons/hi';
+import { HiShieldCheck, HiSparkles, HiRefresh, HiCheckCircle, HiExclamation, HiOutlineEye } from 'react-icons/hi';
 import { useAuth } from '@/lib/AuthContext';
-import { applyAIHighlights } from '@/lib/editor/aiHighlight';
+import { PlagiarismResult } from '@/lib/useContentAnalysis';
+import { AIResult } from '@/lib/aiHeuristics';
 
-export default function LiveAnalysisReport({ text, editor }: { text: string; editor?: any }) {
+interface LiveAnalysisReportProps {
+    isAnalyzing: boolean;
+    plagiarismResult: PlagiarismResult | null;
+    aiResult: AIResult | null;
+    error: string | null;
+    sentenceCount: number;
+    forceCheck: () => void;
+    onToggleHeatmap: () => void;
+    isHeatmapOpen: boolean;
+}
+
+export default function LiveAnalysisReport({
+    isAnalyzing,
+    plagiarismResult,
+    aiResult,
+    error,
+    sentenceCount,
+    forceCheck,
+    onToggleHeatmap,
+    isHeatmapOpen
+}: LiveAnalysisReportProps) {
     const { user } = useAuth();
-    const { isAnalyzing, plagiarismResult, aiResult, error, sentenceCount, forceCheck } = useContentAnalysis(text);
-
-    useEffect(() => {
-        if (editor && aiResult && !isAnalyzing) {
-            applyAIHighlights(editor, aiResult.highlightedSentences);
-        } else if (editor && (isAnalyzing || !aiResult)) {
-            // clear highlights on new analysis or reset
-            applyAIHighlights(editor, []);
-        }
-    }, [editor, aiResult, isAnalyzing]);
 
     if (!user?.isPremium) return null;
 
@@ -88,20 +97,61 @@ export default function LiveAnalysisReport({ text, editor }: { text: string; edi
 
                 {/* AI Detection Section */}
                 <div>
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">AI Probability</span>
+                    <div className="flex items-start justify-between mb-1">
+                        <div>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">AI Probability</span>
+                            {aiResult && !isAnalyzing && (
+                                <div className={`text-[10px] uppercase font-bold mt-1 ${
+                                    aiResult.score > 60 ? 'text-red-500' :
+                                    aiResult.score > 30 ? 'text-amber-500' : 'text-emerald-500'
+                                }`}>
+                                    Confidence: {aiResult.confidenceLevel}
+                                </div>
+                            )}
+                        </div>
                         {isAnalyzing ? (
                             <div className="w-10 h-4 bg-slate-200 animate-pulse rounded" />
                         ) : (
-                            <span className={`text-sm font-black ${
+                            <span className={`text-xl font-black ${
                                 !aiResult ? 'text-slate-300' :
-                                aiResult.score > 50 ? 'text-amber-500' :
-                                aiResult.score > 75 ? 'text-red-500' : 'text-emerald-500'
+                                aiResult.score > 60 ? 'text-red-500' :
+                                aiResult.score > 30 ? 'text-amber-500' : 'text-emerald-500'
                             }`}>
                                 {aiResult ? `${aiResult.score}%` : '--'}
                             </span>
                         )}
                     </div>
+                    {aiResult && !isAnalyzing && (
+                        <div className="mt-2 text-[10px] text-slate-400 font-medium italic">
+                            {aiResult.verdict === 'Likely Human' ? (
+                                'Writing exhibits natural variation and unpredictability.'
+                            ) : aiResult.verdict === 'Mixed/Uncertain' ? (
+                                'Contains a mix of predictable structure and human variance.'
+                            ) : (
+                                'High structural uniformity, predictable flow, or repetitive n-grams.'
+                            )}
+                        </div>
+                    )}
+                    
+                    {/* Heatmap Toggle Button */}
+                    <button 
+                        onClick={onToggleHeatmap}
+                        className={`w-full mt-3 py-2 px-3 rounded-lg border text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all ${
+                            isHeatmapOpen 
+                            ? 'bg-slate-100 border-slate-200 text-slate-600 shadow-inner' 
+                            : 'bg-primary-50 border-primary-100 text-primary-600 hover:bg-primary-100'
+                        }`}
+                    >
+                        <HiOutlineEye className="w-4 h-4" />
+                        {isHeatmapOpen ? 'Close Heatmap' : 'Open Heatmap'}
+                    </button>
+                </div>
+
+                {/* Disclaimer */}
+                <div className="bg-slate-50 border border-slate-100 rounded-lg p-2.5 mt-2">
+                    <p className="text-[9px] text-slate-500 leading-tight">
+                        <span className="font-bold text-slate-700">Disclaimer:</span> This analysis is based on mathematical heuristics and ML probability. It may falsely flag well-written human content as AI. Use as a guide.
+                    </p>
                 </div>
 
             </div>

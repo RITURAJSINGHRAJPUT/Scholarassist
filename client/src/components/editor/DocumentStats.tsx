@@ -13,6 +13,9 @@ interface DocumentStatsProps {
     setLanguage: (l: string) => void;
     lineHeight: string;
     setLineHeight: (h: string) => void;
+    contentData: any; // Result of useContentAnalysis
+    onToggleHeatmap: () => void;
+    isHeatmapOpen: boolean;
 }
 
 interface CitationItem {
@@ -30,7 +33,10 @@ export default function DocumentStats({
     language, 
     setLanguage, 
     lineHeight, 
-    setLineHeight 
+    setLineHeight,
+    contentData,
+    onToggleHeatmap,
+    isHeatmapOpen
 }: DocumentStatsProps) {
     const [libraryCitations, setLibraryCitations] = useState<CitationItem[]>([]);
     const [docCitations, setDocCitations] = useState<CitationItem[]>([]);
@@ -178,7 +184,16 @@ export default function DocumentStats({
                 </div>
 
                 {/* Live Analysis Panel built into sidebar */}
-                <LiveAnalysisReport text={editor.getText()} editor={editor} />
+                <LiveAnalysisReport 
+                    isAnalyzing={contentData.isAnalyzing}
+                    plagiarismResult={contentData.plagiarismResult}
+                    aiResult={contentData.aiResult}
+                    error={contentData.error}
+                    sentenceCount={contentData.sentenceCount}
+                    forceCheck={contentData.forceCheck}
+                    onToggleHeatmap={onToggleHeatmap}
+                    isHeatmapOpen={isHeatmapOpen}
+                />
             </div>
 
             {/* Export Section */}
