@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Editor } from '@tiptap/react';
 import CitationModal from './CitationModal';
+import LiveAnalysisReport from './LiveAnalysisReport';
 
 interface DocumentStatsProps {
     editor: Editor | null;
@@ -175,6 +176,9 @@ export default function DocumentStats({
                         </div>
                     </div>
                 </div>
+
+                {/* Live Analysis Panel built into sidebar */}
+                <LiveAnalysisReport text={editor.getText()} />
             </div>
 
             {/* Export Section */}
