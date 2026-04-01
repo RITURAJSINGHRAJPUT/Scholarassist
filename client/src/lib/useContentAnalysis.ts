@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 
+import { analyzeOfflineAI, AIResult } from './aiHeuristics';
+
 export interface FlaggedSentence {
     text: string;
     similarity: number;
@@ -14,12 +16,6 @@ export interface PlagiarismResult {
     verdict: 'original' | 'low' | 'moderate' | 'high';
     verdictLabel: string;
     flaggedSentences: FlaggedSentence[];
-}
-
-export interface AIResult {
-    score: number;
-    verdict: 'human' | 'uncertain' | 'mixed' | 'ai';
-    verdictLabel: string;
 }
 
 export function useContentAnalysis(text: string) {
@@ -46,16 +42,17 @@ export function useContentAnalysis(text: string) {
         setError(null);
 
         try {
-            const [plagiarismResponse, aiResponse] = await Promise.all([
-                api.post('/plagiarism/check', { text: textToAnalyze }),
-                api.post('/ai-detector/check', { text: textToAnalyze })
-            ]);
-
+            // Run Plagiarism Async
+            const plagiarismResponse = await api.post('/plagiarism/check', { text: textToAnalyze });
             setPlagiarismResult(plagiarismResponse.data);
-            setAiResult(aiResponse.data);
+            
+            // Run offline AI Detection Instantly
+            const localAIResult = analyzeOfflineAI(textToAnalyze);
+            if (localAIResult) setAiResult(localAIResult);
+            
             lastAnalyzedText.current = textToAnalyze;
             
-            // Refresh usage after automated check (if deduction is required)
+            // Refresh usage after automated check
             refreshUsage();
         } catch (err: any) {
             console.error('Content analysis failed:', err);

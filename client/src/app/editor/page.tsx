@@ -20,6 +20,7 @@ import { Color } from '@tiptap/extension-color';
 import { FontSize } from '@/lib/editor/fontSize';
 import { Citation } from '@/lib/editor/citation';
 import { LineHeight } from '@/lib/editor/lineHeight';
+import { AIHighlight } from '@/lib/editor/aiHighlight';
 import Link from 'next/link';
 import { 
     HiPlus, 
@@ -195,6 +196,7 @@ function EditorContentInternal() {
             LineHeight.configure({
                 defaultLineHeight: '1.5',
             }),
+            AIHighlight,
         ],
         []
     );

@@ -178,7 +178,7 @@ export default function DocumentStats({
                 </div>
 
                 {/* Live Analysis Panel built into sidebar */}
-                <LiveAnalysisReport text={editor.getText()} />
+                <LiveAnalysisReport text={editor.getText()} editor={editor} />
             </div>
 
             {/* Export Section */}

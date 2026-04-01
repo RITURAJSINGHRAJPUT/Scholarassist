@@ -1,11 +1,22 @@
 'use client';
+import { useEffect } from 'react';
 import { useContentAnalysis } from '@/lib/useContentAnalysis';
 import { HiShieldCheck, HiSparkles, HiRefresh, HiCheckCircle, HiExclamation } from 'react-icons/hi';
 import { useAuth } from '@/lib/AuthContext';
+import { applyAIHighlights } from '@/lib/editor/aiHighlight';
 
-export default function LiveAnalysisReport({ text }: { text: string }) {
+export default function LiveAnalysisReport({ text, editor }: { text: string; editor?: any }) {
     const { user } = useAuth();
     const { isAnalyzing, plagiarismResult, aiResult, error, sentenceCount, forceCheck } = useContentAnalysis(text);
+
+    useEffect(() => {
+        if (editor && aiResult && !isAnalyzing) {
+            applyAIHighlights(editor, aiResult.highlightedSentences);
+        } else if (editor && (isAnalyzing || !aiResult)) {
+            // clear highlights on new analysis or reset
+            applyAIHighlights(editor, []);
+        }
+    }, [editor, aiResult, isAnalyzing]);
 
     if (!user?.isPremium) return null;
 
