@@ -1,6 +1,4 @@
 'use client';
-'use client';
-'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -78,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <div className="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center text-xs font-bold">
                             {admin.username.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-sm text-primary-300">{admin.username}</span>
+                        <span className="text-sm text-primary-300 truncate flex-1" title={admin.username}>{admin.username}</span>
                     </div>
                     <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-white transition-colors w-full">
                         <HiLogout className="w-5 h-5" />
