@@ -38,8 +38,7 @@ const validateLogin = [
     body('username')
         .trim()
         .notEmpty().withMessage('Username is required')
-        .isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters')
-        .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username must be alphanumeric'),
+        .isLength({ min: 3, max: 100 }).withMessage('Username must be 3-100 characters'),
     body('password')
         .notEmpty().withMessage('Password is required')
         .isLength({ min: 6, max: 100 }).withMessage('Password must be 6-100 characters'),

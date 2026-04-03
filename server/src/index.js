@@ -16,6 +16,7 @@ const aiDetectorRoutes = require('./routes/aiDetectorRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
+const templateRoutes = require('./routes/templateRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,6 +68,7 @@ app.use('/api/ai-detector', aiDetectorRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/templates', templateRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

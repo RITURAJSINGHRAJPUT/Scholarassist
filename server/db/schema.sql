@@ -140,9 +140,11 @@ CREATE INDEX IF NOT EXISTS idx_document_fingerprints_hash ON document_fingerprin
 -- Research Paper Editor Documents
 CREATE TABLE IF NOT EXISTS documents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES admin_users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES app_users(id) ON DELETE CASCADE,
   title TEXT NOT NULL DEFAULT 'Untitled Document',
   content JSONB DEFAULT '{}',
+  layout VARCHAR(50) DEFAULT 'single',
+  is_saved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -183,3 +185,7 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 );
 
 CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_date ON usage_tracking(user_id, usage_date);
+
+-- ================================================================
+-- ROW LEVEL SECURITY (RLS)
+-- ================================================================

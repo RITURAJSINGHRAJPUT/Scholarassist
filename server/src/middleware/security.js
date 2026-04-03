@@ -40,7 +40,7 @@ function setupSecurity(app) {
     // Strict rate limiting for auth
     const authLimiter = rateLimit({
         windowMs: 15 * 60 * 1000,
-        max: 10,
+        max: process.env.NODE_ENV === 'development' ? 100 : 10,
         message: { error: 'Too many login attempts, please try again later.' },
     });
     app.use('/api/auth/', authLimiter);

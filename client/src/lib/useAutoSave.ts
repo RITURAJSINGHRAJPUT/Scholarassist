@@ -9,7 +9,7 @@ export function useAutoSave(documentId: string | null) {
     const { updateDocument } = useDocuments();
 
     const triggerSave = useCallback(
-        (data: { title?: string; content?: Record<string, unknown> }) => {
+        (data: { title?: string; content?: Record<string, unknown>; layout?: string }) => {
             if (!documentId) return;
 
             setSaveStatus('saving');

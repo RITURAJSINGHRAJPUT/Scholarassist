@@ -4,11 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Editor } from '@tiptap/react';
 import {
     HiCode,
-    HiOutlineBookOpen,
     HiOutlinePhotograph,
     HiOutlineTable,
 } from 'react-icons/hi';
-import CitationModal from './CitationModal';
 
 interface ToolbarProps {
     editor: Editor | null;
@@ -24,7 +22,7 @@ const FONTS = [
 ];
 
 const FONT_SIZES = [
-    '8px', '9px', '10px', '11px', '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px', '48px', '60px', '72px'
+    '8pt', '9pt', '10pt', '11pt', '12pt', '14pt', '16pt', '18pt', '20pt', '24pt', '30pt', '36pt', '48pt', '60pt', '72pt'
 ];
 
 const LINE_HEIGHTS = [
@@ -35,7 +33,6 @@ const LINE_HEIGHTS = [
 ];
 
 export default function EditorToolbar({ editor }: ToolbarProps) {
-    const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
     const [, setUpdate] = useState(0);
 
     // Force re-render on editor transactions (selection change, content change)
@@ -50,17 +47,10 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
 
     if (!editor) return null;
 
-    const currentFont = editor.getAttributes('textStyle').fontFamily || 'var(--font-serif), Newsreader, serif';
-    const currentSize = editor.getAttributes('textStyle').fontSize || '16px';
+    const currentFont = editor.getAttributes('textStyle').fontFamily || '"Times New Roman", serif';
+    const currentSize = editor.getAttributes('textStyle').fontSize || '12pt';
     const currentLineHeight = editor.getAttributes('paragraph').lineHeight || '1.15';
 
-    const handleCitationSubmit = (data: any) => {
-        editor.chain().focus().setCitation({
-            id: Date.now().toString(),
-            ...data,
-            number: 1
-        }).run();
-    };
 
     return (
         <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 flex items-center gap-1.5 flex-wrap border-b border-slate-200">
@@ -88,7 +78,7 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
                         className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-700 cursor-pointer hover:border-primary-300 transition focus:outline-none focus:ring-2 focus:ring-primary-500/10 min-w-[60px]"
                     >
                         {FONT_SIZES.map(s => (
-                            <option key={s} value={s}>{s.replace('px', '')}</option>
+                            <option key={s} value={s}>{s.replace(/px|pt/g, '')}</option>
                         ))}
                     </select>
                 </div>
@@ -196,13 +186,6 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
             {/* Advanced Inserts */}
             <div className="flex items-center gap-0.5 bg-slate-50/50 p-1 rounded-xl border border-slate-100">
                 <button
-                    onClick={() => setIsCitationModalOpen(true)}
-                    className={`p-1.5 rounded-lg text-sm transition-all hover:bg-primary-50 text-slate-600 hover:text-primary-600`}
-                    title="Add Citation"
-                >
-                    <HiOutlineBookOpen className="w-4 h-4" />
-                </button>
-                <button
                     onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
                     className="p-1.5 rounded-lg text-sm transition-all hover:bg-primary-50 text-slate-600 hover:text-primary-600"
                     title="Insert Table"
@@ -246,12 +229,6 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
                 </button>
             </div>
 
-            {/* Advanced Citation Modal Component */}
-            <CitationModal 
-                isOpen={isCitationModalOpen}
-                onClose={() => setIsCitationModalOpen(false)}
-                onSubmit={handleCitationSubmit}
-            />
         </div>
     );
 }
