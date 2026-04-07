@@ -79,3 +79,6 @@ async function seedAdmin() {
 }
 
 seedAdmin();
+
+// Username: [EMAIL_ADDRESS]scholarassist.connect@gmail.com
+// Password: Utsav@799020

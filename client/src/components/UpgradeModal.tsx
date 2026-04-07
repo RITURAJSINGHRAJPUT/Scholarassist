@@ -120,11 +120,12 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 {/* Header */}
                 <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 px-8 pt-8 pb-14 relative overflow-hidden">
                     {/* Decorative element */}
-                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
                     
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90 z-20"
+                        className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90 z-50"
                     >
                         <HiX className="w-5 h-5" />
                     </button>

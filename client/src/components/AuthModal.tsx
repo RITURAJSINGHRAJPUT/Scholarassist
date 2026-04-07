@@ -100,12 +100,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 {/* Header Section */}
                 <div className="hero-gradient px-8 pt-8 pb-14 relative overflow-hidden">
                     {/* Decorative circles */}
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary-400/20 rounded-full blur-3xl"></div>
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary-400/20 rounded-full blur-3xl pointer-events-none"></div>
                     
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90"
+                        className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90 z-50"
                     >
                         <HiX className="w-5 h-5" />
                     </button>

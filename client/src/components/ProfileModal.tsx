@@ -71,7 +71,7 @@ export default function ProfileModal() {
                         : 'bg-gradient-to-r from-primary-600 via-primary-700 to-primary-900'
                 }`}>
                     {/* Animated Background Orbs */}
-                    <div className="absolute inset-0 opacity-30">
+                    <div className="absolute inset-0 opacity-30 pointer-events-none">
                         <div className="absolute -top-12 -left-12 w-64 h-64 bg-white/20 rounded-full blur-[80px] animate-pulse" />
                         <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-white/10 rounded-full blur-[60px]" 
                              style={{ animation: 'float 10s ease-in-out infinite' }} />
@@ -79,8 +79,9 @@ export default function ProfileModal() {
                     </div>
 
                     <button 
+                        type="button"
                         onClick={() => setShowProfileModal(false)}
-                        className="absolute top-6 right-6 p-2.5 bg-black/10 hover:bg-black/20 text-white rounded-full backdrop-blur-lg transition-all active:scale-90 z-20"
+                        className="absolute top-6 right-6 p-2.5 bg-black/10 hover:bg-black/20 text-white rounded-full backdrop-blur-lg transition-all active:scale-90 z-50"
                     >
                         <HiX className="w-4 h-4" />
                     </button>
