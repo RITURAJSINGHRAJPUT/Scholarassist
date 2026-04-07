@@ -43,6 +43,7 @@ import { useAutoSave } from '@/lib/useAutoSave';
 import { useContentAnalysis } from '@/lib/useContentAnalysis';
 import HeatmapPreview from '@/components/editor/HeatmapPreview';
 import { useAuth } from '@/lib/AuthContext';
+import ProtectedToolWrapper from '@/components/ProtectedToolWrapper';
 
 // Standard hardcoded templates as a robust fallback
 const FALLBACK_TEMPLATES = [
@@ -144,7 +145,9 @@ export default function ResearchEditorPage() {
                 <div className="animate-spin w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full" />
             </div>
         }>
-            <EditorContentInternal />
+            <ProtectedToolWrapper toolName="Research Editor">
+                <EditorContentInternal />
+            </ProtectedToolWrapper>
         </Suspense>
     );
 }
@@ -208,7 +211,7 @@ function EditorContentInternal() {
         }
     }, [isIEEE]);
 
-    const { isAuthenticated, setShowAuthModal } = useAuth();
+    const { isAuthenticated, isLoading, setShowAuthModal } = useAuth();
 
     // Document Settings State
     const [margins, setMargins] = useState('STANDARD');
@@ -373,35 +376,6 @@ function EditorContentInternal() {
         }
     }, [lineHeight, editor]);
 
-    // URL Synchronization Effect
-    useEffect(() => {
-        if (urlId) {
-            if (urlId !== currentDocId) {
-                handleOpenDocument(urlId);
-            }
-        } else if (!showDocList) {
-            // If no ID in URL but we are in editor, go back to list
-            setShowDocList(true);
-            setCurrentDocId(null);
-        }
-    }, [urlId, currentDocId]);
-
-    // Initial Load
-    useEffect(() => {
-        loadDocuments();
-        fetchTemplates();
-        
-        const stashed = localStorage.getItem('editor_startup_content');
-        if (stashed && editor) {
-            editor.commands.setContent(stashed);
-            setShowDocList(false);
-            localStorage.removeItem('editor_startup_content');
-            
-            // Optionally set a title or trigger a save later
-            setCurrentTitle('Imported Analysis Text');
-        }
-    }, [editor, loadDocuments]);
-
     const handleNewDocument = useCallback(async (templateId?: string) => {
         if (!isAuthenticated) {
             setShowAuthModal(true);
@@ -548,6 +522,41 @@ function EditorContentInternal() {
     const handleAddSection = useCallback((name: string) => {
         setSections((prev) => [...prev, name]);
     }, []);
+
+    // URL Synchronization Effect
+    useEffect(() => {
+        if (!isLoading && isAuthenticated && urlId) {
+            if (urlId !== currentDocId) {
+                handleOpenDocument(urlId);
+            }
+        } else if (!isLoading && !isAuthenticated && !showDocList) {
+            // If not authenticated, ensure we show doc list (or ProtectedToolWrapper handle it)
+            setShowDocList(true);
+            setCurrentDocId(null);
+        } else if (!urlId && !showDocList) {
+            // If no ID in URL but we are in editor, go back to list
+            setShowDocList(true);
+            setCurrentDocId(null);
+        }
+    }, [urlId, currentDocId, isLoading, isAuthenticated, handleOpenDocument, showDocList]);
+
+    // Initial Load
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            loadDocuments();
+            fetchTemplates();
+        }
+        
+        const stashed = localStorage.getItem('editor_startup_content');
+        if (stashed && editor) {
+            editor.commands.setContent(stashed);
+            setShowDocList(false);
+            localStorage.removeItem('editor_startup_content');
+            
+            // Optionally set a title or trigger a save later
+            setCurrentTitle('Imported Analysis Text');
+        }
+    }, [editor, loadDocuments, fetchTemplates, isAuthenticated, isLoading]);
 
     // Document list view
     if (showDocList) {
