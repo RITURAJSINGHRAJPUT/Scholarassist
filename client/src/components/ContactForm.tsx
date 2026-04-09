@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 import api from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function ContactForm() {
+    const { isAuthenticated, setShowAuthModal } = useAuth();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -10,6 +12,12 @@ export default function ContactForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!isAuthenticated) {
+            setShowAuthModal(true, 'login');
+            return;
+        }
+
         if (!form.name || !form.email || !form.message) {
             setError('Please fill in all required fields.');
             return;

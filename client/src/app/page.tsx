@@ -46,7 +46,7 @@ export default function HomePage() {
             <div className="animate-fade-in-up">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-white/90 text-sm mb-6">
                 <HiShieldCheck className="w-4 h-4" />
-                Trusted by 10,000+ Students Worldwide
+                Trusted by 1000+ Students Worldwide
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight font-[var(--font-heading)]">
                 Expert Academic<br />
@@ -98,9 +98,9 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { value: '10,000+', label: 'Students Helped' },
+                { value: '100+', label: 'Students Helped' },
                 { value: '98%', label: 'Satisfaction Rate' },
-                { value: '50+', label: 'Expert Advisors' },
+                { value: '5+', label: 'Expert Advisors' },
                 { value: '24/7', label: 'Support Available' },
               ].map((s, i) => (
                 <div key={i}>

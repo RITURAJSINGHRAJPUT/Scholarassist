@@ -6,6 +6,7 @@ const xss = require('xss');
 const pool = require('../config/db');
 const upload = require('../middleware/upload');
 const { authenticate } = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/userAuth');
 const { encrypt } = require('../utils/encryption');
 const { sendNewInquiryNotification } = require('../utils/email');
 const { logAction } = require('../utils/auditLog');
@@ -30,8 +31,8 @@ async function verifyRecaptcha(token) {
     }
 }
 
-// POST /api/inquiries - Create inquiry (public)
-router.post('/', upload.single('file'), validateInquiry, async (req, res) => {
+// POST /api/inquiries - Create inquiry (requires login)
+router.post('/', authenticateUser, upload.single('file'), validateInquiry, async (req, res) => {
     try {
         const { name, email, phone, academic_level, service_type, deadline, message, recaptcha_token } = req.body;
 

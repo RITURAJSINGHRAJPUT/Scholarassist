@@ -3,12 +3,14 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { HiCloudUpload, HiX, HiCheckCircle } from 'react-icons/hi';
 import api from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
 
 const academicLevels = ['High School', 'Undergraduate', 'Master\'s', 'PhD / Doctorate', 'Post-Doctoral'];
 const serviceTypes = ['Thesis Assistance', 'Research Paper Support', 'Essay Writing', 'Project Documentation', 'Literature Review', 'Dissertation Support', 'Other'];
 
 export default function ConsultationForm() {
     const router = useRouter();
+    const { isAuthenticated, setShowAuthModal } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -30,6 +32,12 @@ export default function ConsultationForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!isAuthenticated) {
+            setShowAuthModal(true, 'login');
+            return;
+        }
+
         if (!validate()) return;
 
         setLoading(true);

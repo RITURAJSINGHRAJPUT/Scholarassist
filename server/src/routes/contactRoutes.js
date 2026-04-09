@@ -2,13 +2,14 @@ const express = require('express');
 const xss = require('xss');
 const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/userAuth');
 const { logAction } = require('../utils/auditLog');
 const { validateContact, validateUUID } = require('../middleware/validate');
 
 const router = express.Router();
 
-// POST /api/contact - Submit contact message (public)
-router.post('/', validateContact, async (req, res) => {
+// POST /api/contact - Submit contact message (requires login)
+router.post('/', authenticateUser, validateContact, async (req, res) => {
     try {
         const { name, email, subject, message } = req.body;
 
