@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { HiHome, HiInbox, HiPencilAlt, HiLogout, HiMenu, HiX, HiStar, HiUserGroup, HiDocumentText } from 'react-icons/hi';
+import { HiHome, HiInbox, HiPencilAlt, HiLogout, HiMenu, HiX, HiStar, HiUserGroup, HiDocumentText, HiMail } from 'react-icons/hi';
 
 const navItems = [
     { name: 'Dashboard', href: '/admin', icon: HiHome },
@@ -11,6 +11,7 @@ const navItems = [
     { name: 'Blog', href: '/admin/blog', icon: HiPencilAlt },
     { name: 'Templates', href: '/admin/templates', icon: HiDocumentText },
     { name: 'Testimonials', href: '/admin/testimonials', icon: HiStar },
+    { name: 'Contacts', href: '/admin/contacts', icon: HiMail },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

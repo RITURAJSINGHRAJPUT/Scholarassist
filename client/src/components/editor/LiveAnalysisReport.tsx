@@ -1,5 +1,6 @@
 'use client';
-import { HiShieldCheck, HiSparkles, HiRefresh, HiCheckCircle, HiExclamation, HiOutlineEye } from 'react-icons/hi';
+import { useState } from 'react';
+import { HiShieldCheck, HiSparkles, HiRefresh, HiCheckCircle, HiExclamation, HiOutlineEye, HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import { useAuth } from '@/lib/AuthContext';
 import { PlagiarismResult } from '@/lib/useContentAnalysis';
 import { AIResult } from '@/lib/aiHeuristics';
@@ -26,6 +27,7 @@ export default function LiveAnalysisReport({
     isHeatmapOpen
 }: LiveAnalysisReportProps) {
     const { user } = useAuth();
+    const [showFlagged, setShowFlagged] = useState(false);
 
     if (!user?.isPremium) return null;
 
@@ -87,8 +89,29 @@ export default function LiveAnalysisReport({
                         )}
                     </div>
                     {plagiarismResult?.flaggedSentences && plagiarismResult.flaggedSentences.length > 0 && (
-                        <div className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded inline-block">
-                            {plagiarismResult.flaggedSentences.length} Flagged Sentences
+                        <div className="mt-2">
+                            <button 
+                                onClick={() => setShowFlagged(!showFlagged)}
+                                className="flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-colors px-2 py-1 rounded"
+                            >
+                                {plagiarismResult.flaggedSentences.length} Flagged Sentences
+                                {showFlagged ? <HiChevronUp className="w-3 h-3" /> : <HiChevronDown className="w-3 h-3" />}
+                            </button>
+                            {showFlagged && (
+                                <div className="mt-2 space-y-2 max-h-32 overflow-y-auto pr-1">
+                                    {plagiarismResult.flaggedSentences.map((sent, idx) => (
+                                        <div key={idx} className="bg-red-50/50 p-2 rounded text-[10px] border border-red-100">
+                                            <p className="text-slate-700 italic border-l-2 border-red-300 pl-2">"{sent.text}"</p>
+                                            <div className="flex justify-between mt-1 items-center">
+                                                <span className="text-red-600 font-bold">{Math.round(sent.similarity)}% Match</span>
+                                                <a href={sent.source.url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline truncate ml-2 max-w-[120px]" title={sent.source.title}>
+                                                    {sent.source.title}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

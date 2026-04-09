@@ -20,8 +20,10 @@ export default function ContactForm() {
             await api.post('/contact', form);
             setSuccess(true);
             setForm({ name: '', email: '', subject: '', message: '' });
-        } catch {
-            setError('Failed to send message. Please try again.');
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { error?: string, details?: Array<{message: string}> } } };
+            const errorMessage = error.response?.data?.details?.[0]?.message || error.response?.data?.error || 'Failed to send message. Please try again.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

@@ -55,11 +55,16 @@ async function searchWeb(query) {
         const searchQuery = encodeURIComponent(query.slice(0, 200));
         const ddgUrl = `https://html.duckduckgo.com/html/?q=${searchQuery}`;
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const response = await fetch(ddgUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         const html = await response.text();
         const resultMatches = html.match(/uddg=([^"&]+)/g) || [];
@@ -82,11 +87,16 @@ async function searchWeb(query) {
         const crossrefUrl = `https://api.crossref.org/works?query=${searchQuery}&rows=5`;
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@scholarassist.com';
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const response = await fetch(crossrefUrl, {
             headers: {
                 'User-Agent': `ScholarAssist/1.0 (https://scholarassist.com; mailto:${adminEmail})`,
-            }
+            },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             console.warn(`CrossRef search failed (${response.status}): ${response.statusText}`);
@@ -285,9 +295,11 @@ router.post('/check', authenticateUser, checkUsageLimit('plagiarism'), upload.si
                 let maxSimilarity = 0;
                 const matchedSources = [];
 
-                for (const url of urls) {
+                // Process up to 3 URLs concurrently to avoid huge timeouts!
+                const topUrls = urls.slice(0, 3);
+                await Promise.all(topUrls.map(async (url) => {
                     const content = await fetchPageContent(url);
-                    if (content && content.length > 200) { // Increased min content length for better accuracy
+                    if (content && content.length > 200) { 
                         const cosineSim = calculateSimilarity(sentence, content);
                         const ngramSim = nGramSimilarity(sentence, content, 5);
                         const similarity = Math.max(cosineSim, ngramSim);
@@ -304,7 +316,7 @@ router.post('/check', authenticateUser, checkUsageLimit('plagiarism'), upload.si
                             });
                         }
                     }
-                }
+                }));
 
                 matchedSources.sort((a, b) => b.similarity - a.similarity);
 

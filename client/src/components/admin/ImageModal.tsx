@@ -54,18 +54,20 @@ export default function ImageModal({ isOpen, onClose, onSelect, currentImage }: 
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                     <h3 className="font-bold text-slate-800">Select Featured Image</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">✕</button>
+                    <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600">✕</button>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex border-b border-slate-100">
                     <button
+                        type="button"
                         onClick={() => setActiveTab('upload')}
                         className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'upload' ? 'text-primary-600 border-b-2 border-primary-600' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Upload File
                     </button>
                     <button
+                        type="button"
                         onClick={() => setActiveTab('link')}
                         className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'link' ? 'text-primary-600 border-b-2 border-primary-600' : 'text-slate-500 hover:text-slate-700'}`}
                     >
@@ -172,6 +174,7 @@ export default function ImageModal({ isOpen, onClose, onSelect, currentImage }: 
                             )}
 
                             <button
+                                type="button"
                                 onClick={handleLinkSubmit}
                                 disabled={!imageUrl}
                                 className="w-full py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition shadow-lg shadow-primary-200 disabled:opacity-50"

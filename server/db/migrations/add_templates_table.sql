@@ -84,3 +84,6 @@ VALUES (
   'Conference',
   5
 ) ON CONFLICT (id) DO NOTHING;
+
+-- Enable Row Level Security to satisfy Supabase security recommendations
+ALTER TABLE editor_templates ENABLE ROW LEVEL SECURITY;

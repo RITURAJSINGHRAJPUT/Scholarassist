@@ -1,6 +1,4 @@
 'use client';
-'use client';
-'use client';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
@@ -122,12 +120,6 @@ export default function NewBlogPostPage() {
                                 <p className="text-xs text-slate-400 mt-1">Upload file or use external / Google Drive link</p>
                             </div>
                         )}
-                        <ImageModal 
-                            isOpen={isImageModalOpen} 
-                            onClose={() => setIsImageModalOpen(false)} 
-                            onSelect={handleImageSelect}
-                            currentImage={form.featured_image}
-                        />
                     </div>
 
                     {/* Content */}
@@ -207,6 +199,12 @@ export default function NewBlogPostPage() {
                     </div>
                 </form>
             </div>
+            <ImageModal 
+                isOpen={isImageModalOpen} 
+                onClose={() => setIsImageModalOpen(false)} 
+                onSelect={handleImageSelect}
+                currentImage={form.featured_image}
+            />
         </div>
     );
 }

@@ -754,6 +754,7 @@ function EditorContentInternal() {
                                 <div className="w-1/2 h-full border-l border-slate-200 shadow-xl z-10 bg-white">
                                     <HeatmapPreview 
                                         aiResult={contentData.aiResult} 
+                                        plagiarismResult={contentData.plagiarismResult}
                                         isAnalyzing={contentData.isAnalyzing}
                                         onClose={() => setIsHeatmapOpen(false)}
                                     />
