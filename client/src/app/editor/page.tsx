@@ -30,7 +30,8 @@ import {
     HiSave,
     HiOutlineArrowLeft,
     HiCheck,
-    HiX
+    HiX,
+    HiUpload
 } from 'react-icons/hi';
 import api from '@/lib/api';
 import type { Paragraph } from 'docx';
@@ -168,6 +169,7 @@ function EditorContentInternal() {
     const [activeLayout, setActiveLayout] = useState('single');
     const [templateLoading, setTemplateLoading] = useState<string | null>(null);
     const [templates, setTemplates] = useState<any[]>(FALLBACK_TEMPLATES);
+    const [isDragging, setIsDragging] = useState(false);
 
     // Fetch dynamic templates
     const fetchTemplates = useCallback(async () => {
@@ -409,6 +411,82 @@ function EditorContentInternal() {
         }
     }, [createDocument, editor, loadDocuments, router, isAuthenticated, setShowAuthModal]);
 
+    const handleImportDocx = useCallback(async (file: File) => {
+        if (!isAuthenticated) {
+            setShowAuthModal(true);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const mammoth = (await import('mammoth')).default;
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.convertToHtml({ arrayBuffer });
+            const html = result.value;
+
+            // Generate title from file name
+            const title = file.name.replace(/\.docx?$/i, '');
+
+            // Create doc
+            const doc = await createDocument(title, html || '<p>Imported document</p>', 'single');
+            
+            router.push(`/editor?id=${doc.id}`);
+            setCurrentDocId(doc.id);
+            setCurrentTitle(title);
+            setIsSavedInDB(false);
+            setIsDirty(false);
+            setActiveLayout('single');
+            setSections([]);
+            
+            setTimeout(() => {
+                 editor?.commands.setContent(html);
+            }, 100);
+
+            setShowDocList(false);
+            await loadDocuments();
+            
+        } catch (error) {
+            console.error('Failed to import docx:', error);
+            alert('Failed to read Word document. Please ensure it is a valid .docx file.');
+        } finally {
+            setLoading(false);
+            setIsDragging(false);
+        }
+    }, [isAuthenticated, setShowAuthModal, createDocument, router, editor, loadDocuments]);
+
+    const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleImportDocx(file);
+        if (e.target) e.target.value = '';
+    }, [handleImportDocx]);
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer.types.includes('Files')) {
+            setIsDragging(true);
+        }
+    }, []);
+
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    }, []);
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+        
+        const file = e.dataTransfer.files?.[0];
+        if (file && (file.name.endsWith('.docx') || file.name.endsWith('.doc'))) {
+            handleImportDocx(file);
+        } else if (file) {
+            alert('Please upload a valid Word document (.doc or .docx)');
+        }
+    }, [handleImportDocx]);
+
     const handleOpenDocument = useCallback(
         async (id: string) => {
             try {
@@ -427,8 +505,18 @@ function EditorContentInternal() {
                 setActiveLayout(layout);
                 if (layout === 'ieee-journal') setLineHeight('1.0');
 
-                const content = typeof doc.content === 'string' ? JSON.parse(doc.content) : doc.content;
-                if (content && Object.keys(content).length > 0) {
+                let content;
+                if (typeof doc.content === 'string') {
+                    try {
+                        content = JSON.parse(doc.content);
+                    } catch (e) {
+                        content = doc.content; // Use raw string (HTML) if not valid JSON
+                    }
+                } else {
+                    content = doc.content;
+                }
+
+                if (content && (typeof content === 'string' || Object.keys(content).length > 0)) {
                     editor?.commands.setContent(content);
                 } else {
                     editor?.commands.setContent(DEFAULT_TEMPLATE_CONTENT);
@@ -561,10 +649,22 @@ function EditorContentInternal() {
     // Document list view
     if (showDocList) {
         return (
-            <div className="flex flex-col min-h-screen bg-[#f8f9fc] pt-16">
-
-
-                <div className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
+            <div 
+                className={`flex flex-col min-h-screen pt-16 transition-colors duration-300 relative ${isDragging ? 'bg-primary-50' : 'bg-[#f8f9fc]'}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
+                {isDragging && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-primary-500/10 backdrop-blur-sm border-4 border-dashed border-primary-400 m-4 rounded-3xl pointer-events-none">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center">
+                            <HiUpload className="w-16 h-16 text-primary-500 mb-4 animate-bounce" />
+                            <h2 className="text-2xl font-bold text-slate-800">Drop Word File to Edit</h2>
+                            <p className="text-slate-500 mt-2 font-medium">Supports .doc and .docx formats</p>
+                        </div>
+                    </div>
+                )}
+                <div className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 relative">
                     {/* Templates Section */}
                     <div className="mb-12">
                         <div className="flex items-center justify-between mb-6">
@@ -608,13 +708,20 @@ function EditorContentInternal() {
                             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Your Documents</h2>
                             <p className="text-slate-400 text-sm font-medium">Continue working on your research</p>
                         </div>
-                        <button
-                            onClick={() => handleNewDocument()}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md active:scale-95"
-                        >
-                            <HiPlus className="w-4 h-4" />
-                            Blank Page
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <label className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:border-primary-400 hover:text-primary-600 transition-all shadow-sm cursor-pointer active:scale-95">
+                                <HiUpload className="w-4 h-4" />
+                                Upload Word (.docx)
+                                <input type="file" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={handleFileUpload} />
+                            </label>
+                            <button
+                                onClick={() => handleNewDocument()}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md active:scale-95"
+                            >
+                                <HiPlus className="w-4 h-4" />
+                                Blank Page
+                            </button>
+                        </div>
                     </div>
 
                     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
@@ -755,6 +862,7 @@ function EditorContentInternal() {
                                     <HeatmapPreview 
                                         aiResult={contentData.aiResult} 
                                         plagiarismResult={contentData.plagiarismResult}
+                                        docTitle={currentTitle}
                                         isAnalyzing={contentData.isAnalyzing}
                                         onClose={() => setIsHeatmapOpen(false)}
                                     />

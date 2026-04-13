@@ -5,7 +5,7 @@ export interface Document {
     id: string;
     user_id: string | null;
     title: string;
-    content: Record<string, unknown>;
+    content: any;
     layout: string;
     is_saved: boolean;
     created_at: string;
@@ -29,7 +29,7 @@ export function useDocuments() {
         return res.data as DocumentListItem[];
     }, []);
 
-    const createDocument = useCallback(async (title?: string, content?: Record<string, unknown>, layout?: string) => {
+    const createDocument = useCallback(async (title?: string, content?: any, layout?: string) => {
         const res = await api.post(API_BASE, { 
             title, 
             content, 
@@ -43,7 +43,7 @@ export function useDocuments() {
         return res.data as Document;
     }, []);
 
-    const updateDocument = useCallback(async (id: string, data: { title?: string; content?: Record<string, unknown>; layout?: string; is_saved?: boolean }) => {
+    const updateDocument = useCallback(async (id: string, data: { title?: string; content?: any; layout?: string; is_saved?: boolean }) => {
         const res = await api.put(`${API_BASE}/${id}`, data);
         return res.data as Document;
     }, []);
